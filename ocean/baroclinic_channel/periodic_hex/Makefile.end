@@ -1,0 +1,37 @@
+
+CPP = cpp -C -P -traditional
+CPPFLAGS = 
+CPPINCLUDES = 
+INCLUDES = -I$(NETCDF)/include
+LIBS = -L$(NETCDF)/lib -lnetcdf
+
+RM = rm -f
+
+ifneq ($(wildcard $(NETCDF)/lib/libnetcdff.*), ) # CHECK FOR NETCDF4
+    LIBS += -lnetcdff
+endif # CHECK FOR NETCDF4
+
+##########################
+
+.SUFFIXES: .F .o
+
+
+OBJS = periodic_grid.o \
+       module_cell_indexing.o \
+       module_write_netcdf.o
+
+all: periodic_grid
+
+periodic_grid.o: module_cell_indexing.o module_write_netcdf.o 
+
+periodic_grid: $(OBJS)
+	$(SFC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+clean:
+	$(RM) *.o *.mod periodic_grid
+
+.F.o:
+	$(RM) $@ $*.mod
+	$(CPP) $(CPPFLAGS) $(CPPINCLUDES) $< > $*.f90
+	$(SFC) $(FFLAGS) -c $*.f90 $(INCLUDES)
+	$(RM) $*.f90

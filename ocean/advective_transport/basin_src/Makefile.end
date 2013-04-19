@@ -1,0 +1,43 @@
+
+CPP = cpp -C -P -traditional
+CPPFLAGS = 
+CPPINCLUDES = 
+INCLUDES = -I$(NETCDF)/include
+LIBS = -L$(NETCDF)/lib -lnetcdf
+
+RM = rm -f
+
+ifneq ($(wildcard $(NETCDF)/lib/libnetcdff.*), ) # CHECK FOR NETCDF4
+    LIBS += -lnetcdff
+endif # CHECK FOR NETCDF4
+
+##########################
+
+.SUFFIXES: .F .o
+
+OBJS = basin.o \
+       utilities.o \
+       module_read_netcdf.o \
+       module_read_topo.o \
+       module_read_TS.o \
+       module_read_monthly.o \
+       module_cullLoops.o \
+       module_write_netcdf.o
+
+
+all: map
+
+#basin.o: utilities.o module_write_netcdf.o module_read_netcdf.o module_read_topo.o module_read_TS.o module_cullLoops.o
+basin.o: utilities.o module_write_netcdf.o module_read_netcdf.o module_read_topo.o module_read_TS.o module_read_monthly.o module_cullLoops.o
+
+map: $(OBJS)
+	$(SFC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+clean:
+	$(RM) *.o *.mod map *.f90
+
+.F.o:
+	$(RM) $@ $*.mod
+	$(CPP) $(CPPFLAGS) $(CPPINCLUDES) $< > $*.f90
+	$(SFC) $(FFLAGS) -c $*.f90 $(INCLUDES)
+	$(RM) $*.f90

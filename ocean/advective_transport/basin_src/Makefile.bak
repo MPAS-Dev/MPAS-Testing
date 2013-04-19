@@ -1,0 +1,66 @@
+# IBM with Xlf compilers
+#SFC = xlf90
+#SCC = xlc
+#FFLAGS = -qrealsize=8 -g -C
+#CFLAGS = -g
+#LDFLAGS = -g -C
+
+# pgf90
+#SFC = pgf90
+#SCC = pgcc
+#FFLAGS = -r8 -O3
+#CFLAGS = -O3
+#LDFLAGS = -O3
+
+# ifort
+SFC = ifort
+SCC = icc
+FFLAGS = -real-size 64 #-g -traceback -check all
+CFLAGS = #-g
+LDFLAGS = #-g -traceback -check all
+
+# absoft
+#SFC = f90
+#SCC = gcc
+#FFLAGS = -dp -O3
+#CFLAGS = -O3
+#LDFLAGS = -O3
+#NETCDF = /Users/maltrud/local
+
+
+CPP = cpp -C -P -traditional
+CPPFLAGS = 
+CPPINCLUDES = 
+INCLUDES = -I$(NETCDF)/include
+LIBS = -L$(NETCDF)/lib -lnetcdf
+
+RM = rm -f
+
+##########################
+
+.SUFFIXES: .F .o
+
+
+OBJS = basin.o \
+       utilities.o \
+       module_read_netcdf.o \
+       module_read_topo.o \
+       module_read_TS.o \
+       module_cullLoops.o \
+       module_write_netcdf.o
+
+all: map
+
+basin.o: utilities.o module_write_netcdf.o module_read_netcdf.o module_read_topo.o module_read_TS.o module_cullLoops.o
+
+map: $(OBJS)
+	$(SFC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+clean:
+	$(RM) *.o *.mod map *.f90
+
+.F.o:
+	$(RM) $@ $*.mod
+	$(CPP) $(CPPFLAGS) $(CPPINCLUDES) $< > $*.f90
+	$(SFC) $(FFLAGS) -c $*.f90 $(INCLUDES)
+	$(RM) $*.f90

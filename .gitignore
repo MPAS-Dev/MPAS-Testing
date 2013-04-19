@@ -1,0 +1,6 @@
+# Ignore all NetCDF files
+*.nc
+
+# Ignore all graph and partition files
+*.info
+*.info.part.*
