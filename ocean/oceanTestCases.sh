@@ -12,7 +12,7 @@
 # REPOSITORY_ADDRESS="https://svn-mpas-model.cgd.ucar.edu/trunk/mpas -r 995"
 # REPOSITORY_ADDRESS="https://svn-mpas-model.cgd.ucar.edu/trunk/mpas --username user --password pass"
 
-REPOSITORY_ADDRESS="https://svn-mpas-model.cgd.ucar.edu/trunk/mpas"
+REPOSITORY_ADDRESS="git@github.com:MPAS-Dev/MPAS.git"
 COMPILE_SET="gfortran"
 MACHINE_NAME="lobo"
 MACHINE_PPN="16"
@@ -48,14 +48,13 @@ setup_mpas () { #{{{
 
 	## Check out mpas from repository
 	echo "Checking out ${REPOSITORY_ADDRESS}"
-	svn co $REPOSITORY_ADDRESS mpas > /dev/null
+	git clone --depth 1 $REPOSITORY_ADDRESS mpas &> /dev/null
 	cd mpas
-	svn up > /dev/null
 
 	## Compile mpas using given compile set
 	echo "Compiling mpas using ${COMPILE_SET}" 
 	make $COMPILE_SET CORE=ocean > /dev/null &> /dev/null
-	REV=`svn info | grep "Revision"`
+    REV=`git log -n 1 | grep "commit" | awk '{print $2}'`
 	cd ..
 
 	## Make a variable containing the make options used to build mpas
@@ -76,8 +75,8 @@ setup_mpas () { #{{{
 	sed -n "/${COMPILE_SET}:/,/:/p" mpas/Makefile | head -n ${NUM_LINES} | tail -n +2 >> .run_info
 	echo "" >> .run_info
 	echo "Checkout path:" >> .run_info
+    echo "Commit: $REV" >> .run_info
 	echo "$REPOSITORY_ADDRESS" >> .run_info
-	echo "$REV" >> .run_info
 	echo "$MACHINE_NAME" >> .run_info
 
 	## Create a header of a Makefile for use in compiling subcode with the same compiler.
@@ -106,7 +105,7 @@ setup () { #{{{
 	cd ${CASE}
 
 	## Call script to setup run directories, and meshes if needed
-	./makeMeshes.sh ${CUR_DIR}/mpas/src/ocean_model.exe ${CUR_DIR}/run_info "$PROC_LIST"
+	./makeMeshes.sh ${CUR_DIR}/mpas/ocean_model ${CUR_DIR}/run_info "$PROC_LIST"
 	cd ${CUR_DIR}
 
 	rm run_info
@@ -269,7 +268,7 @@ clean () { #{{{
 
 MPAS_BUILD_RUN="no"
 ## Check to see if mpas has already been built, if not set it up
-if [ ! -e mpas/src/ocean_model.exe -a $ACTION != "clean" ]; then
+if [ ! -e mpas/ocean_model -a $ACTION != "clean" ]; then
 	if [ $# -ge 3 ]; then
 		echo ""
 		echo "Overriding COMPILE_SET with $3"
@@ -279,7 +278,7 @@ if [ ! -e mpas/src/ocean_model.exe -a $ACTION != "clean" ]; then
 	echo "MPAS is not setup properly yet. Setting up MPAS first."
 	setup_mpas
 
-	if [ ! -e mpas/src/ocean_model.exe ]; then
+	if [ ! -e mpas/ocean_model ]; then
 		echo ""
 		echo "MPAS was not successfully built. Please ensure your compiler set is correct."
 		echo "${COMPILE_SET} was used this time."

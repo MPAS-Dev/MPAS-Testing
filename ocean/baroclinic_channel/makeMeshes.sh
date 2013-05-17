@@ -132,7 +132,11 @@ touch run_paths
 ## Generate full meshes, with initial conditions, using basin. ##
 #################################################################
 echo "   Checking out  basin"
-svn co https://svn-mpas-model.cgd.ucar.edu/branches/ocean_projects/basin/src basin_checkout 1> /dev/null 2> /dev/null
+git clone --no-checkout --depth 1 git@github.com:MPAS-Dev/MPAS-Tools.git basin_repo_checkout 1> /dev/null 2> /dev/null
+cd basin_repo_checkout
+git checkout origin/master -- grid_gen/basin/src
+cd ../
+ln -s basin_repo_checkout/grid_gen/basin/src basin_checkout
 cp basin_src/* basin_checkout/.
 
 echo "   Building Basin"
@@ -319,6 +323,7 @@ rm  MPAS-namelist.input.template
 rm ${TCNAME}*
 rm fort.*
 
-rm -rf basin_checkout
+unlink basin_checkout
+rm -rf basin_repo_checkout
 cd ${CUR_DIR}
 
