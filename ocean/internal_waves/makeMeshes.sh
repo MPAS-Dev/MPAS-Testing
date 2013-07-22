@@ -7,7 +7,7 @@
 
 SPACINGS="5000 25000"
 VERTLEVS="20"
-NX="3"
+NX="4"
 TCNAME="internal_waves"
 AMPLITUDES="2 0.2"
 
