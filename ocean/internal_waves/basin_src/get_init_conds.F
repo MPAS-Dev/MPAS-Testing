@@ -1,8 +1,8 @@
 implicit none
 real :: halfwidth, dtr, pi, p(3), q(3), xin, yin, zin, ulon, ulat, stress, n1, n2, distance, r, temp_t, temp_s
 real :: dotProd
-real :: surfMaxTemp, surfMinTemp
-real :: y_a, y_0, A_0, beta
+real :: backgroundMaxTemp, backgroundMinTemp, bottomMinTemp
+real :: y_a, y_0, A_0, beta, betaTemperature
 real :: yTrans, vertTempChange, maxTemp
 real, dimension(:), allocatable :: vertCoord
 real, dimension(:,:,:), allocatable :: tempHolder
@@ -36,7 +36,6 @@ do i = 1, nVertLevelsMOD
     layerThicknessNew(1,i,:) = layer_thickness_total_max / nVertLevelsMOD
     hZLevel(i) =  layer_thickness_total_max / nVertLevelsMOD
     vertCoord(i) =  i * layer_thickness_total_max / nVertLevelsMOD
-
 end do
 
 bottomDepthNew(:) = layer_thickness_total_max
@@ -50,32 +49,31 @@ densityNew(1,:,:) = 1000.0
 ! set temperature for isopycnal levels
 write(6,*) ' setting temperature'
 vertTempChange = 2.5
-surfMaxTemp = 20.1
-surfMinTemp = 10.1
+backgroundMaxTemp = 20.6
+backgroundMinTemp = 9.5
 do k = 1, nVertLevelsMOD
-     temperatureNew(1,k,:) = (surfMaxTemp - surfMinTemp) * ((-vertCoord(k)+layer_thickness_total_max)/layer_thickness_total_max)+ surfMinTemp
+     temperatureNew(1,k,:) = (backgroundMaxTemp - backgroundMinTemp) * ((-vertCoord(k)+layer_thickness_total_max)/layer_thickness_total_max) + backgroundMinTemp
 enddo
 
 y_a = 50.0e3
-y_0 = 150.0e3
+y_0 = 125.0e3
 A_0 = *AMP
 do i = 1, nCellsNew
   if( abs(yCellNew(i) - y_0) < y_a) then
       do k = 1, nVertLevelsMOD
-         beta = -A_0*(cos(0.5*pi*(yCellNew(i)-y_0)/y_a))*(sin(1.0*pi*(hZLevel(k)-0.5*(layer_thickness_total_max/nVertLevelsMOD))/layer_thickness_total_max) )
-         temperatureNew(1, k, i) = temperatureNew(1, k, i) + beta
+         betaTemperature = -A_0*cos(0.5*pi*(yCellNew(i)-y_0)/y_a)*sin(1.05*pi*vertCoord(k)/layer_thickness_total_max) 
+         temperatureNew(1, k, i) = temperatureNew(1, k, i) + betaTemperature
       end do
   endif
 enddo
 
+! bottomMinTemp is set a little above backgroundMinTemp so gravity waves are not induced along the bottom
+bottomMinTemp = 10.0
+temperatureNew(1,:,:) = max(temperatureNew(1,:,:), bottomMinTemp)
+
 ! basin-mod
 ! set salinity for levels
 salinityNew(1,:,:) = 35.0
-
-! Updating density with linear EOS
-do i = 1,nCellsNew
-  densityNew(1,:,i) = 1000.0*(1.0 - 2.5e-4*temperatureNew(1,1,i) + 7.6e-4*salinityNew(1,1,i))
-enddo
 
 ! basin-mod
 ! set forcing for isopycnal levels

@@ -7,9 +7,9 @@
 
 SPACINGS="5000 25000"
 VERTLEVS="20"
-NX="4"
+NX="2"
 TCNAME="internal_waves"
-AMPLITUDES="2 0.2"
+AMPLITUDES="3 0.2"
 
 ###############################################################
 ## Change reference spacing, time_step, and viscosities here ##
@@ -30,7 +30,7 @@ else
 	PROCS="$3"
 fi
 
-Y_EXTENT="250000"
+Y_EXTENT="275000"
 
 ############################################################
 ## Setup Default namelist keys and values to update later ##
