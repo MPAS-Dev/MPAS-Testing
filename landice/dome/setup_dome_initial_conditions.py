@@ -20,12 +20,12 @@ from math import sqrt
 # If not, land_ice_grid.nc is used.
 if len(sys.argv) > 1:
   if sys.argv[1][0] == '-': # The filename can't begin with a hyphen
-    print '\nUsage:  python setup_dome_initial_conditions.py [GRID.NC]\nIf no filename is supplied, land_ice_grid.nc will be used.'
+    print '\nUsage:  python setup_dome_initial_conditions.py [GRID.NC]\nIf no filename is supplied, landice_grid.nc will be used.'
     sys.exit(0)
   else:
     gridfilename = sys.argv[1]
 else:
-  gridfilename = 'land_ice_grid.nc'
+  gridfilename = 'landice_grid.nc'
 
 
 
@@ -47,11 +47,13 @@ try:
     layerThicknessFractions = gridfile.variables['layerThicknessFractions'][:]
     temperature = gridfile.variables['temperature'][:]
     # Get b.c. variables
-    beta = gridfile.variables['betaTimeSeries'][:]
-    SMB = gridfile.variables['sfcMassBalTimeSeries'][:]
-    Tsfc = gridfile.variables['sfcAirTempTimeSeries'][:]
-    G = gridfile.variables['basalHeatFluxTimeSeries'][:]
-    BMB = gridfile.variables['marineBasalMassBalTimeSeries'][:]
+    SMB = gridfile.variables['sfcMassBal'][:]
+    # These legacy fields are currently not included in the new MPAS   MH 9/19/13 
+    #beta = gridfile.variables['betaTimeSeries'][:]
+    #SMB = gridfile.variables['sfcMassBalTimeSeries'][:]
+    #Tsfc = gridfile.variables['sfcAirTempTimeSeries'][:]
+    #G = gridfile.variables['basalHeatFluxTimeSeries'][:]
+    #BMB = gridfile.variables['marineBasalMassBalTimeSeries'][:]
 except:
     sys.exit('Error: The grid file specified is either missing or lacking needed dimensions/variables.')
 
@@ -71,7 +73,7 @@ thickness[0, r<r0] = h0 * (1.0 - (r[r<r0] / r0)**2)**0.5
 # zero velocity everywhere
 normalVelocity[:] = 0.0
 # flat bed at sea level
-bedTopography[:] = -500.0
+bedTopography[:] = 0.0
 # constant, arbitrary temperature, degrees C
 temperature[:] = -20.0 
 # Setup layerThicknessFractions
@@ -79,10 +81,11 @@ layerThicknessFractions[:] = 1.0 / nVertLevels
 
 # boundary conditions
 # Sample values to use, or comment these out for them to be 0.
-beta[:] = 50000.
+SMB[:] = 0.0
+#beta[:] = 50000.
 #SMB[:] = 2.0/1000.0 * (thickness[:] + bedTopography[:]) - 1.0  # units: m/yr, lapse rate of 1 m/yr with 0 at 500 m
-Tsfc[:,0] = -5.0/1000.0 * (thickness[0,:] + bedTopography[0,:]) # lapse rate of 5 deg / km
-G = 0.01
+#Tsfc[:,0] = -5.0/1000.0 * (thickness[0,:] + bedTopography[0,:]) # lapse rate of 5 deg / km
+#G = 0.01
 #BMB[:] = -20.0  # units: m/yr
 
 # Reassign the modified numpy array values back into netCDF variable objects 
@@ -91,11 +94,12 @@ gridfile.variables['normalVelocity'][:] = normalVelocity
 gridfile.variables['bedTopography'][:] = bedTopography
 gridfile.variables['temperature'][:] = temperature
 gridfile.variables['layerThicknessFractions'][:] = layerThicknessFractions
-gridfile.variables['betaTimeSeries'][:] = beta
-gridfile.variables['sfcMassBalTimeSeries'][:] = SMB
-gridfile.variables['sfcAirTempTimeSeries'][:] = Tsfc
-gridfile.variables['basalHeatFluxTimeSeries'][:] = G
-gridfile.variables['marineBasalMassBalTimeSeries'][:] = BMB
+gridfile.variables['sfcMassBal'][:] = SMB
+#gridfile.variables['betaTimeSeries'][:] = beta
+#gridfile.variables['sfcMassBalTimeSeries'][:] = SMB
+#gridfile.variables['sfcAirTempTimeSeries'][:] = Tsfc
+#gridfile.variables['basalHeatFluxTimeSeries'][:] = G
+#gridfile.variables['marineBasalMassBalTimeSeries'][:] = BMB
 
 gridfile.close()
 print 'Successfully added dome initial conditions to ', gridfilename
