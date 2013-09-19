@@ -23,7 +23,7 @@
 /
 
 &io
-   config_input_name = 'grid.nc'
+   config_input_name = 'landice_grid.nc'
    config_output_name = 'output.nc'
    config_restart_name = 'restart.nc'
    config_output_interval  = '0001-00-00_00:00:00'
