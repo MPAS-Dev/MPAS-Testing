@@ -48,12 +48,16 @@ else:
 # nx = 30
 # ny = 35
 
+
+secInYr = 3600.0 * 24.0 * 365.0  # Note: this may be slightly wrong for some calendar types!
+
+
 f = NetCDFFile(options.filename,'r')
 
 times = f.variables['xtime']
 thickness = f.variables['thickness']
 dcedge = f.variables['dcEdge']
-bedTopography = f.variables['bedTopography']
+#bedTopography = f.variables['bedTopography']  # not needed
 xCell = f.variables['xCell']
 yCell = f.variables['yCell']
 xEdge = f.variables['xEdge']
@@ -121,7 +125,7 @@ if options.saveimages:
 
 
 fig = plt.figure(3)
-for templevel in xrange(0,vert_levs+2):
+for templevel in xrange(0,vert_levs):
     ax = fig.add_subplot(3,4,templevel+1, aspect='equal')
     var_slice = temperature[time_slice,:,templevel]
     # C = plt.contourf(xCell, yCell, var_slice )
@@ -134,15 +138,15 @@ if options.saveimages:
 
 fig = plt.figure(4)
 ax = fig.add_subplot(121, aspect='equal')
-plt.scatter(xEdge[:], yEdge[:], 80, normalVelocity[time_slice,:,0], marker='h', edgecolors='none')
+plt.scatter(xEdge[:], yEdge[:], 80, normalVelocity[time_slice,:,0] * secInYr, marker='h', edgecolors='none')
 plt.colorbar()
-plt.quiver(xEdge[:], yEdge[:], numpy.cos(angleEdge[:]) * normalVelocity[time_slice,:,0], numpy.sin(angleEdge[:]) * normalVelocity[time_slice,:,0])
+plt.quiver(xEdge[:], yEdge[:], numpy.cos(angleEdge[:]) * normalVelocity[time_slice,:,0] * secInYr, numpy.sin(angleEdge[:]) * normalVelocity[time_slice,:,0] * secInYr)
 plt.title('normalVelocity of bottom layer at time ' + str(time_slice) )
 plt.draw()
 ax = fig.add_subplot(122, aspect='equal')
-plt.scatter(xEdge[:], yEdge[:], 80, normalVelocity[time_slice,:,vert_levs - 1], marker='h', edgecolors='none')
+plt.scatter(xEdge[:], yEdge[:], 80, normalVelocity[time_slice,:,vert_levs - 1] * secInYr, marker='h', edgecolors='none')
 plt.colorbar()
-plt.quiver(xEdge[:], yEdge[:], numpy.cos(angleEdge[:]) * normalVelocity[time_slice,:,vert_levs - 1], numpy.sin(angleEdge[:]) * normalVelocity[time_slice,:, vert_levs - 1])
+plt.quiver(xEdge[:], yEdge[:], numpy.cos(angleEdge[:]) * normalVelocity[time_slice,:,vert_levs - 1] * secInYr, numpy.sin(angleEdge[:]) * normalVelocity[time_slice,:, vert_levs - 1] * secInYr )
 plt.title('normalVelocity of top layer at time ' + str(time_slice) )
 plt.draw()
 if options.saveimages:
@@ -150,15 +154,15 @@ if options.saveimages:
 
 fig = plt.figure(5, facecolor='w')
 ax = fig.add_subplot(121, aspect='equal')
-plt.scatter(xCell[:], yCell[:], 80, uReconstructX[time_slice,:,vert_levs - 1], marker='h', edgecolors='none')
+plt.scatter(xCell[:], yCell[:], 80, uReconstructX[time_slice,:,vert_levs - 1] * secInYr, marker='h', edgecolors='none')
 plt.colorbar()
-plt.quiver(xCell[:], yCell[:], uReconstructX[time_slice,:, vert_levs - 1], uReconstructY[time_slice,:, vert_levs - 1])
+plt.quiver(xCell[:], yCell[:], uReconstructX[time_slice,:, vert_levs - 1] * secInYr, uReconstructY[time_slice,:, vert_levs - 1] * secInYr )
 plt.title('uReconstructX of top layer at time ' + str(time_slice) )
 plt.draw()
 ax = fig.add_subplot(122, aspect='equal')
-plt.scatter(xCell[:], yCell[:], 80, uReconstructY[time_slice,:,vert_levs - 1], marker='h', edgecolors='none')
+plt.scatter(xCell[:], yCell[:], 80, uReconstructY[time_slice,:,vert_levs - 1] * secInYr, marker='h', edgecolors='none')
 plt.colorbar()
-plt.quiver(xCell[:], yCell[:], uReconstructX[time_slice,:, vert_levs - 1], uReconstructY[time_slice,:, vert_levs - 1])
+plt.quiver(xCell[:], yCell[:], uReconstructX[time_slice,:, vert_levs - 1] * secInYr, uReconstructY[time_slice,:, vert_levs - 1] * secInYr )
 plt.title('uReconstructY of top layer at time ' + str(time_slice) )
 plt.draw()
 if options.saveimages:
