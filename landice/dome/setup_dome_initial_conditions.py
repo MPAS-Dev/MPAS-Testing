@@ -16,22 +16,29 @@ except ImportError:
       raise ImportError('No netCDF module found')
 from math import sqrt
 
-# Check to see if a grid file was specified on the command line.
-# If not, land_ice_grid.nc is used.
-if len(sys.argv) > 1:
-  if sys.argv[1][0] == '-': # The filename can't begin with a hyphen
-    print '\nUsage:  python setup_dome_initial_conditions.py [GRID.NC]\nIf no filename is supplied, landice_grid.nc will be used.'
-    sys.exit(0)
-  else:
-    gridfilename = sys.argv[1]
+# Parse options
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("-f", "--file", dest="filename", type='string', help="file to setup dome", metavar="FILE")
+parser.add_option("-d", "--dome", dest="dometype", type='choice', choices=('halfar', 'cism'), help="type of dome to setup: 'halfar' or 'cism'", metavar="TYPE")
+options, args = parser.parse_args()
+if options.dometype:
+   if options.dometype == 'cism' or options.dometype == 'halfar':
+      print 'Setting up the dome type: ' + options.dometype
+   else:
+      print "Error: Invalid dome type specified.  Valid types are 'halfar' or 'cism'."
+      sys.exit
 else:
-  gridfilename = 'landice_grid.nc'
-
+   options.dometype='halfar'
+   print 'No dome type specified.  Setting up the Halfar dome by default.'
+if not options.filename:
+   options.filename = 'landice_grid.nc'
+   print 'No file specified.  Attempting to use landice_grid.nc'
 
 
 # Open the file, get needed dimensions
 try:
-    gridfile = NetCDFFile(gridfilename,'r+')
+    gridfile = NetCDFFile(options.filename,'r+')
     if (netCDF_module == 'Scientific.IO.NetCDF'):
          nVertLevels = gridfile.dimensions['nVertLevels']
     else:
@@ -69,7 +76,12 @@ r = ((xCell - x0)**2 + (yCell - y0)**2)**0.5
 # Set default value for non-dome cells
 thickness[:] = 0.0
 # Calculate the dome thickness for cells within the desired radius (thickness will be NaN otherwise)
-thickness[0, r<r0] = h0 * (1.0 - (r[r<r0] / r0)**2)**0.5
+if options.dometype == 'cism':
+   thickness[0, r<r0] = h0 * (1.0 - (r[r<r0] / r0)**2)**0.5
+else:
+   # halfar dome
+   thickness[0, r<r0] = h0 * (1.0 - (r[r<r0] / r0)**(4.0/3.0))**(3.0/7.0)
+
 # zero velocity everywhere
 normalVelocity[:] = 0.0
 # flat bed at sea level
@@ -102,5 +114,5 @@ gridfile.variables['sfcMassBal'][:] = SMB
 #gridfile.variables['marineBasalMassBalTimeSeries'][:] = BMB
 
 gridfile.close()
-print 'Successfully added dome initial conditions to ', gridfilename
+print 'Successfully added dome initial conditions to: ', options.filename
 
