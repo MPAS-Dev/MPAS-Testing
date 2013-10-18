@@ -1,0 +1,8 @@
+The EISMINT-1 test cases are in this directory.
+
+For details of the tests, see: 
+http://homepages.vub.ac.be/~phuybrec/eismint.html
+and
+Huybrechts, Ph., A.J. Payne and EISMINT Intercomparison Group (1996). The EISMINT benchmarks for testing ice-sheet models. Annals of Glaciology 23, 1-12. 
+
+All of the tests in this directory use the same base mesh.
