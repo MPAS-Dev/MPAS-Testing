@@ -27,16 +27,17 @@ else:
    timelev = -1
    print 'No time level specified.  Attempting to use final time.'
 
-
+################### DEFINE FUNCTIONS ######################
 # Define the function to calculate the Halfar thickness
-def halfar(t,x,y):
-  # These constants should come from setup_dome_initial_conditions.py and the model itself.
+def halfar(t,x,y, A, n, rho):
+  # A   # s^{-1} Pa^{-3}
+  # n   # Glen flow law exponent
+  # rho # ice density kg m^{-3}
+
+  # These constants should come from setup_dome_initial_conditions.py.
   # For now they are being hardcoded.
   R0 = 60000.0 * np.sqrt(0.125)   # initial dome radius
   H0 = 2000.0 * np.sqrt(0.125)    # initial dome thickness at center
-  n = 3.0     # Glen flow law exponent
-  A = 6.8e-24 # s^{-1} Pa^{-3}
-  rho = 900.0 # ice density kg m^{-3}
   g = 9.1801  # gravity m/s/s
   alpha = 1.0/9.0
   beta = 1.0/18.0
@@ -49,7 +50,7 @@ def halfar(t,x,y):
   y0 = yCell.min() + 0.5 * (yCell.max() - yCell.min() )
 
 
-  t0 = (beta/Gamma) * (7.0/4.0)**3 * (R0**4/H0**7)
+  t0 = (beta/Gamma) * (7.0/4.0)**3 * (R0**4/H0**7)  # NOTE: These constants assume n=3 - they need to be generalized to allow other n's 
   t=t+t0
   t=t/t0
 
@@ -78,8 +79,10 @@ def xtime2numtime(xtime):
   numtime = netCDF4.date2num(dt, units='seconds since '+str(dt[0]))   # use the netCDF4 module's function for converting a datetime to a time number
   return numtime
 
+################### END OF FUNCTIONS ######################
 
-# open supplied file and get thickness slice needed
+
+# open supplied MPAS output file and get thickness slice needed
 filein = netCDF4.Dataset(options.filename,'r')
 xCell = filein.variables['xCell'][:]
 yCell = filein.variables['yCell'][:]
@@ -89,8 +92,21 @@ thk = filein.variables['thickness'][:]
 xtime = filein.variables['xtime'][:] 
 numtime = xtime2numtime(xtime)
 
+# Find out what the ice density and flowA values for this run were.
+print '\nCollecting parameter values from the output file.'
+flowA = filein.config_default_flowParamA
+print 'Using a flowParamA value of: ' + str(flowA)
+flow_n = filein.config_flowLawExponent
+print 'Using a flowLawExponent value of: ' + str(flow_n)
+if flow_n != 3:
+        print 'Error: The Halfar script currently only supports a flow law exponent of 3.'
+        sys.exit
+rhoi = filein.config_ice_density
+print 'Using an ice density value of: ' + str(rhoi)
+print ''
+
 # Call the halfar function
-thkHalfar = halfar(numtime[timelev]-numtime[0], xCell, yCell)
+thkHalfar = halfar(numtime[timelev]-numtime[0], xCell, yCell, flowA, flow_n, rhoi)
 
 thkDiff = thk[timelev, :] - thkHalfar
 
