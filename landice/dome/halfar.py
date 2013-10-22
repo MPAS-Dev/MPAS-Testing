@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename", help="file to test", metavar="FILE")
 parser.add_option("-t", "--time", dest="t", help="which time level to use", metavar="T")
+parser.add_option("-s", "--save", action="store_true", dest="saveimage", help="include this flag to save plot")
+parser.add_option("-n", "--nodisp", action="store_true", dest="hidefigs", help="include this flag to not display plot")
 
 options, args = parser.parse_args()
 if not options.filename:
@@ -94,6 +96,7 @@ numtime = xtime2numtime(xtime)
 
 # Find out what the ice density and flowA values for this run were.
 print '\nCollecting parameter values from the output file.'
+
 flowA = filein.config_default_flowParamA
 print 'Using a flowParamA value of: ' + str(flowA)
 flow_n = filein.config_flowLawExponent
@@ -103,19 +106,30 @@ if flow_n != 3:
         sys.exit
 rhoi = filein.config_ice_density
 print 'Using an ice density value of: ' + str(rhoi)
-print ''
+
+dynamicThickness = filein.config_dynamic_thickness
+print '\nDynamic thickness for this run = ' + str(dynamicThickness)
+
+print 'Using model time of ' + xtime[timelev,:].tostring().strip() + '\n'
+
 
 # Call the halfar function
 thkHalfar = halfar(numtime[timelev]-numtime[0], xCell, yCell, flowA, flow_n, rhoi)
 
 thkDiff = thk[timelev, :] - thkHalfar
+thkDiffIce = thkDiff[ np.where( thk[timelev,:] > 0.0) ]  # Restrict to cells modeled to have ice
+RMS = ( (thkDiffIce**2).sum() / float(len(thkDiffIce)) )**0.5
+
 
 # Print some stats about the error
 print 'Error statistics for cells modeled to have ice:'
-print '* Maximum error is ' + str( thkDiff[ np.where( thk[timelev,:] > 0.0) ].max() )
-print '* Minimum error is ' + str( thkDiff[ np.where( thk[timelev,:] > 0.0) ].min() )
-print '* Mean error is ' + str( thkDiff[ np.where( thk[timelev,:] > 0.0) ].mean() )
-print '* Median error is ' + str( np.median(thkDiff[ np.where( thk[timelev,:] > 0.0) ]) )
+print '* RMS error = ' + str( RMS )
+print '* Maximum error = ' + str( thkDiffIce.max() )
+print '* Minimum error = ' + str( thkDiffIce.min() )
+print '* Mean error = ' + str( thkDiffIce.mean() )
+print '* Median error = ' + str( np.median(thkDiffIce) )
+print '* Mean absolute error = ' + str( np.absolute(thkDiffIce).mean() )
+print ''
 
 # Plot the results
 fig = plt.figure(1, facecolor='w')
@@ -140,5 +154,16 @@ plt.axis('equal')
 plt.title('Modeled thickness - Analytic thickness \n at time ' + netCDF4.chartostring(xtime)[timelev].strip() ) 
 
 plt.draw()
-plt.show()
+
+if options.saveimage:
+    plotname = 'halfar-results.png'
+    plt.savefig(plotname, dpi=150)
+    print 'Saved plot as ' + plotname
+
+if options.hidefigs:
+     print "Plot display disabled with -n argument."
+else:
+     print 'Showing plot...  Close plot window to exit.'
+     plt.show()
+
 
