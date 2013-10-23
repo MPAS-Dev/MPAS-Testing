@@ -54,10 +54,14 @@ y0 = yCell.min() + 0.5 * (yCell.max() - yCell.min() )
 # Calculate distance of each cell center from domain center
 d = ((xCell - x0)**2 + (yCell - y0)**2)**0.5
 # Define function for SMB
-Rel = 450000.0  # m
+rhoi = 910.0
+scyr = 3600.0*24.0*365.0
+Rel = 450.0  # km
 s = 10.0**-2     # given in units of m/a/km, 
-s = s * 910.0 / 1000.0 / (3600.0*24.0*365.0)  # converted to kg/m2/s/m using ice density of 910.0
-SMB[:] = numpy.minimum(0.5 * 900.0 / (3600.0*24.0*365.0),   s * (Rel - d) )
+smb=numpy.minimum(0.5, s * (Rel - d/1000.0)) # in m ice/yr
+#s = s * rhoi / 1000.0 / (3600.0*24.0*365.0)  # converted to kg/m2/s/m using ice density of 910.0
+#SMB[:] = numpy.minimum(0.5 * rhoi / (3600.0*24.0*365.0),   s * (Rel - d) )
+SMB[:] = smb * rhoi / scyr  # in kg/m2/s
 
 # Basal heat flux should be -42.e-3 once it is added.
 # Surface temperature should be 270 K - 0.01 H when it is added.
