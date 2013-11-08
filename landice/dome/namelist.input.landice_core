@@ -4,8 +4,8 @@
 &advection
 /
 &physical_parameters
-	config_ice_density = 900.0
-	config_default_flowParamA = 4.3905866e-24
+	config_ice_density = 910.0
+	config_default_flowParamA = 3.1709792e-24
 	config_dynamic_thickness = 100.0
 /
 &time_integration
@@ -14,7 +14,7 @@
 &time_management
 	config_do_restart = .false.
 	config_start_time = "0000-01-01_00:00:00"
-	config_stop_time = "0200-01-01_00:00:00"
+	config_stop_time = "0100-01-01_00:00:00"
 	config_run_duration = "none"
 	config_calendar_type = "gregorian_noleap"
 /
@@ -23,12 +23,12 @@
 	config_output_name = "output.nc"
 	config_restart_name = "restart.nc"
 	config_restart_timestamp_name = "restart_timestamp"
-	config_restart_interval = "3650_00:00:00"
+	config_restart_interval = "36500_00:00:00"
 	config_output_interval = "0001_00:00:00"
 	config_stats_interval = "0000_01:00:00"
 	config_write_stats_on_startup = .true.
 	config_write_output_on_startup = .true.
-	config_frames_per_outfile = 1000
+	config_frames_per_outfile = 0
 	config_pio_num_iotasks = 0
 	config_pio_stride = 1
 /

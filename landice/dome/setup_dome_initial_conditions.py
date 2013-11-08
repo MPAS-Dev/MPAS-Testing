@@ -87,7 +87,7 @@ normalVelocity[:] = 0.0
 # flat bed at sea level
 bedTopography[:] = 0.0
 # constant, arbitrary temperature, degrees C
-temperature[:] = -20.0 
+temperature[:] = 0.0 
 # Setup layerThicknessFractions
 layerThicknessFractions[:] = 1.0 / nVertLevels
 
