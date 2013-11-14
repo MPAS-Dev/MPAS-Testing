@@ -8,7 +8,9 @@ Included files:
 
 * setup_initial_conditions_EISMINT1-MovingMargin-1.py
 This file can be used to setup the initial conditions for the test case.  If you downloaded a tar archive, you do not need to do this.  However, if you want to modify the IC for some reason, you can edit and run this script.
-
+ 
+* check_output_eismint-mm1.py
+This script can be used to compare model output to results from the EISMINT intercomparison.
 
 Instructions:
 Once you symlink or copy the landice_model executable and adjust the namelist settings if desired, you can simply run the model with, e.g.:
