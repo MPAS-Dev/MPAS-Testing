@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# A script to compare CISM model output to the Halfar analytic solution of the dome test case.
+# A script to compare MPAS model output to the Halfar analytic solution of the dome test case.
 # Matt Hoffman, LANL, September 2013
 
 import sys
