@@ -116,7 +116,7 @@ print 'Using model time of ' + xtime[timelev,:].tostring().strip() + '\n'
 # Call the halfar function
 thkHalfar = halfar(numtime[timelev]-numtime[0], xCell, yCell, flowA, flow_n, rhoi)
 
-thkDiff = thk[timelev, :] - thkHalfar
+thkDiff = (thk[timelev, :] - thkHalfar) 
 thkDiffIce = thkDiff[ np.where( thk[timelev,:] > 0.0) ]  # Restrict to cells modeled to have ice
 RMS = ( (thkDiffIce**2).sum() / float(len(thkDiffIce)) )**0.5
 
@@ -132,26 +132,36 @@ print '* Mean absolute error = ' + str( np.absolute(thkDiffIce).mean() )
 print ''
 
 # Plot the results
-fig = plt.figure(1, facecolor='w')
-markersize = 30.0
+fig = plt.figure(1, figsize=(16, 4.5), facecolor='w', dpi=100)
+markersize = 35.0
+gray = np.ones(3)*0.8
 
 fig.add_subplot(1,3,1)
-plt.scatter(xCell,yCell,markersize,thk[timelev,:], marker='h', edgecolors='none')
+maskindices = np.nonzero(thk[:][timelev,:] > 0.0)[:]
+plt.scatter(xCell/1000.0,yCell/1000.0,markersize,gray, marker='.', edgecolors='none')
+plt.scatter(xCell[maskindices]/1000.0,yCell[maskindices]/1000.0,markersize,thk[timelev,maskindices], marker='h', edgecolors='none')
 plt.colorbar()
 plt.axis('equal')
 plt.title('Modeled thickness (m) \n at time ' + netCDF4.chartostring(xtime)[timelev].strip() ) 
+plt.xlabel('x (km)'); plt.ylabel('y (km)')
 
 fig.add_subplot(1,3,2)
-plt.scatter(xCell,yCell,markersize,thkHalfar, marker='h', edgecolors='none')
+halmaskindices = np.nonzero(thkHalfar[:] > 0.0)[:]
+plt.scatter(xCell/1000.0,yCell/1000.0,markersize,gray, marker='.', edgecolors='none')
+plt.scatter(xCell[halmaskindices]/1000.0,yCell[halmaskindices]/1000.0,markersize,thkHalfar[halmaskindices], marker='h', edgecolors='none')
 plt.colorbar()
 plt.axis('equal')
 plt.title('Analytic thickness (m) \n at time ' + netCDF4.chartostring(xtime)[timelev].strip() ) 
+plt.xlabel('x (km)'); plt.ylabel('y (km)')
 
 fig.add_subplot(1,3,3)
-plt.scatter(xCell,yCell,markersize,thkDiff, marker='h', edgecolors='none')
+plt.scatter(xCell/1000.0,yCell/1000.0,markersize,gray, marker='.', edgecolors='none')
+plt.scatter(xCell/1000.0,yCell/1000.0,markersize,thkDiff, marker='h', edgecolors='none', cmap=plt.cm.RdBu)
 plt.colorbar()
+plt.clim([-1.0*np.absolute(thkDiff).max(), np.absolute(thkDiff).max()])
 plt.axis('equal')
-plt.title('Modeled thickness - Analytic thickness \n at time ' + netCDF4.chartostring(xtime)[timelev].strip() ) 
+plt.title('Modeled thickness - Analytic thickness (m) \n at time ' + netCDF4.chartostring(xtime)[timelev].strip() ) 
+plt.xlabel('x (km)'); plt.ylabel('y (km)')
 
 plt.draw()
 
