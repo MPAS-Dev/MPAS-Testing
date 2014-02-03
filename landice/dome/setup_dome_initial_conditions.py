@@ -97,7 +97,7 @@ SMB[:] = 0.0
 #beta[:] = 50000.
 #SMB[:] = 2.0/1000.0 * (thickness[:] + bedTopography[:]) - 1.0  # units: m/yr, lapse rate of 1 m/yr with 0 at 500 m
 # Convert from units of m/yr to kg/m2/s using an assumed ice density
-smb[:] = smb[:] *910.0/(3600.0*24.0*365.0)
+SMB[:] = SMB[:] *910.0/(3600.0*24.0*365.0)
 
 #Tsfc[:,0] = -5.0/1000.0 * (thickness[0,:] + bedTopography[0,:]) # lapse rate of 5 deg / km
 #G = 0.01
