@@ -40,10 +40,10 @@ def halfar(t,x,y, A, n, rho):
   # For now they are being hardcoded.
   R0 = 60000.0 * np.sqrt(0.125)   # initial dome radius
   H0 = 2000.0 * np.sqrt(0.125)    # initial dome thickness at center
-  g = 9.1801  # gravity m/s/s
+  g = 9.80616  # gravity m/s/s -- value used by mpas_constants
   alpha = 1.0/9.0
   beta = 1.0/18.0
-  secpera = 31556926.0
+  secpera = 3600.0*24.0*365.0  # value for gregorian_noleap calendar
   Gamma = 2.0 / (n+2.0) * A * (rho * g)**n
 
   #xmax = max(x)#+(x[1]-x[0])
@@ -112,6 +112,10 @@ print '\nDynamic thickness for this run = ' + str(dynamicThickness)
 
 print 'Using model time of ' + xtime[timelev,:].tostring().strip() + '\n'
 
+if filein.config_calendar_type != "gregorian_noleap":
+        print 'Error: The Halfar script currently assumes a gregorian_noleap calendar.  Modify it to proceed with your calendar type of: ', filein.config_calendar_type
+        sys.exit
+
 
 # Call the halfar function
 thkHalfar = halfar(numtime[timelev]-numtime[0], xCell, yCell, flowA, flow_n, rhoi)
@@ -124,11 +128,12 @@ RMS = ( (thkDiffIce**2).sum() / float(len(thkDiffIce)) )**0.5
 # Print some stats about the error
 print 'Error statistics for cells modeled to have ice:'
 print '* RMS error = ' + str( RMS )
-print '* Maximum error = ' + str( thkDiffIce.max() )
 print '* Minimum error = ' + str( thkDiffIce.min() )
+print '* Maximum error = ' + str( thkDiffIce.max() )
 print '* Mean error = ' + str( thkDiffIce.mean() )
 print '* Median error = ' + str( np.median(thkDiffIce) )
 print '* Mean absolute error = ' + str( np.absolute(thkDiffIce).mean() )
+print '* Median absolute error = ' + str( np.median(np.absolute(thkDiffIce)) )
 print ''
 
 # Plot the results
