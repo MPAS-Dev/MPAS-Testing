@@ -46,15 +46,19 @@ try:
     if nVertLevels != 9:
          print 'nVerLevels in the supplied file was ', nVertLevels, '.  Were you expecting 9?'
     # Get variables
-    xCell = gridfile.variables['xCell'][:]
-    yCell = gridfile.variables['yCell'][:]
-    thickness = gridfile.variables['thickness'][:]
-    bedTopography = gridfile.variables['bedTopography'][:]
-    normalVelocity = gridfile.variables['normalVelocity'][:]
-    layerThicknessFractions = gridfile.variables['layerThicknessFractions'][:]
-    temperature = gridfile.variables['temperature'][:]
+    xCell = gridfile.variables['xCell']
+    yCell = gridfile.variables['yCell']
+    xEdge = gridfile.variables['xEdge']
+    yEdge = gridfile.variables['yEdge']
+    xVertex = gridfile.variables['xVertex']
+    yVertex = gridfile.variables['yVertex']
+    thickness = gridfile.variables['thickness']
+    bedTopography = gridfile.variables['bedTopography']
+    normalVelocity = gridfile.variables['normalVelocity']
+    layerThicknessFractions = gridfile.variables['layerThicknessFractions']
+    temperature = gridfile.variables['temperature']
     # Get b.c. variables
-    SMB = gridfile.variables['sfcMassBal'][:]
+    SMB = gridfile.variables['sfcMassBal']
     # These legacy fields are currently not included in the new MPAS   MH 9/19/13 
     #beta = gridfile.variables['betaTimeSeries'][:]
     #SMB = gridfile.variables['sfcMassBalTimeSeries'][:]
@@ -65,22 +69,46 @@ except:
     sys.exit('Error: The grid file specified is either missing or lacking needed dimensions/variables.')
 
 
+
+# Find center of domain
+x0 = xCell[:].min() + 0.5 * (xCell[:].max() - xCell[:].min() )
+y0 = yCell[:].min() + 0.5 * (yCell[:].max() - yCell[:].min() )
+# Calculate distance of each cell center from dome center
+r = ((xCell[:] - x0)**2 + (yCell[:] - y0)**2)**0.5
+
+# Center the dome in the center of the cell that is closest to the center of the domain.
+#   NOTE: for some meshes, maybe we don't want to do this - could add command-line argument controlling this later.
+putOriginOnACell = True
+if putOriginOnACell:
+   centerCellIndex = numpy.abs(r[:]).argmin()
+   #print x0, y0, centerCellIndex, xCell[centerCellIndex], yCell[centerCellIndex]
+   xShift = -1.0 * xCell[centerCellIndex]
+   yShift = -1.0 * yCell[centerCellIndex]
+   xCell[:] = xCell[:] + xShift
+   yCell[:] = yCell[:] + yShift
+   xEdge[:] = xEdge[:] + xShift
+   yEdge[:] = yEdge[:] + yShift
+   xVertex[:] = xVertex[:] + xShift
+   yVertex[:] = yVertex[:] + yShift
+   # Now update origin location and distance array
+   x0 = 0.0
+   y0 = 0.0
+   r = ((xCell[:] - x0)**2 + (yCell[:] - y0)**2)**0.5
+
 # Assign variable values for dome
 # Define dome dimensions - all in meters
 r0 = 60000.0 * sqrt(0.125)
 h0 = 2000.0 * sqrt(0.125)
-x0 = xCell.min() + 0.5 * (xCell.max() - xCell.min() )
-y0 = yCell.min() + 0.5 * (yCell.max() - yCell.min() )
-# Calculate distance of each cell center from dome center
-r = ((xCell - x0)**2 + (yCell - y0)**2)**0.5
 # Set default value for non-dome cells
 thickness[:] = 0.0
 # Calculate the dome thickness for cells within the desired radius (thickness will be NaN otherwise)
+thickness_field = thickness[0,:]
 if options.dometype == 'cism':
-   thickness[0, r<r0] = h0 * (1.0 - (r[r<r0] / r0)**2)**0.5
+   thickness_field[r<r0] = h0 * (1.0 - (r[r<r0] / r0)**2)**0.5
 else:
    # halfar dome
-   thickness[0, r<r0] = h0 * (1.0 - (r[r<r0] / r0)**(4.0/3.0))**(3.0/7.0)
+   thickness_field[r<r0] = h0 * (1.0 - (r[r<r0] / r0)**(4.0/3.0))**(3.0/7.0)
+thickness[0,:] = thickness_field   
 
 # zero velocity everywhere
 normalVelocity[:] = 0.0
@@ -103,19 +131,8 @@ SMB[:] = SMB[:] *910.0/(3600.0*24.0*365.0)
 #G = 0.01
 #BMB[:] = -20.0  # units: m/yr
 
-# Reassign the modified numpy array values back into netCDF variable objects 
-gridfile.variables['thickness'][:] = thickness
-gridfile.variables['normalVelocity'][:] = normalVelocity
-gridfile.variables['bedTopography'][:] = bedTopography
-gridfile.variables['temperature'][:] = temperature
-gridfile.variables['layerThicknessFractions'][:] = layerThicknessFractions
-gridfile.variables['sfcMassBal'][:] = SMB
-#gridfile.variables['betaTimeSeries'][:] = beta
-#gridfile.variables['sfcMassBalTimeSeries'][:] = SMB
-#gridfile.variables['sfcAirTempTimeSeries'][:] = Tsfc
-#gridfile.variables['basalHeatFluxTimeSeries'][:] = G
-#gridfile.variables['marineBasalMassBalTimeSeries'][:] = BMB
 
 gridfile.close()
+
 print 'Successfully added dome initial conditions to: ', options.filename
 
