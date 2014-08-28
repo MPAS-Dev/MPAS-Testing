@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Generate initial conditions for dome land ice test case
 
 import sys, numpy

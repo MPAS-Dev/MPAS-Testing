@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Generate initial conditions for EISMINT-1 moving margin land ice test case
 
 import sys, numpy

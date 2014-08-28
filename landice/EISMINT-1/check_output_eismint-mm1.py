@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # A script to compare MPAS model output to the EISMINT Moving Margin 1 test case.
 # Matt Hoffman, LANL, September 2013
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # A script to compare MPAS model output to the Halfar analytic solution of the dome test case.
 # Matt Hoffman, LANL, September 2013
 
