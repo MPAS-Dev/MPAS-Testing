@@ -46,11 +46,7 @@ def halfar(t,x,y, A, n, rho):
   secpera = 3600.0*24.0*365.0  # value for gregorian_noleap calendar
   Gamma = 2.0 / (n+2.0) * A * (rho * g)**n
 
-  #xmax = max(x)#+(x[1]-x[0])
-  #ymax = max(y)#+(y[1]-y[0])
-  x0 = xCell.min() + 0.5 * (xCell.max() - xCell.min() )
-  y0 = yCell.min() + 0.5 * (yCell.max() - yCell.min() )
-
+  x0 = 0.0; y0 = 0.0   # The IC file puts the center of the dome and the domain at (0,0)
 
   t0 = (beta/Gamma) * (7.0/4.0)**3 * (R0**4/H0**7)  # NOTE: These constants assume n=3 - they need to be generalized to allow other n's 
   t=t+t0

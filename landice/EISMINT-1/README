@@ -2,15 +2,17 @@ EISMINT-1 Test Cases
 
 Included files:
 
-* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the test case.  It needs to be renamed to 'namelist.input' to run periodic_hex) if mesh needs to be generated.  If you downloaded a tar archive of this test case, you do not need to create the mesh and can ignore this file.
+* namelist.landice is used for running the dome test case with the MPAS land ice core.  It may not include all options available to the model.  See the namelist.landice.defaults file in the MPAS root directory for a list of all options available.  They are also documented in the User's Guide.
 
-* namelist.input / namelist.input.landice_core is used for actually running dome test case in the MPAS land ice core.  It includes most but not all options available to the model.  See the default namelist.input.landice file in the MPAS root directory for a list of all options available.  They are also documented in the User's Guide.  If you downloaded a tar archive of this test case, this should be called namelist.input.
+* streams.landice is used for specifying file input/output settings for the model.
+
+* check_output_eismint-mm1.py
+This script can be used to compare model output to results from the EISMINT intercomparison.
+
+* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the test case.  It needs to be renamed to 'namelist.input' to run periodic_hex) if mesh needs to be generated.  If you downloaded a tar archive of this test case, you do not need to create the mesh and can ignore this file.
 
 * setup_initial_conditions_EISMINT1-MovingMargin-1.py
 This file can be used to setup the initial conditions for the test case.  If you downloaded a tar archive, you do not need to do this.  However, if you want to modify the IC for some reason, you can edit and run this script.
- 
-* check_output_eismint-mm1.py
-This script can be used to compare model output to results from the EISMINT intercomparison.
 
 Instructions:
 Once you symlink or copy the landice_model executable and adjust the namelist settings if desired, you can simply run the model with, e.g.:
