@@ -1,0 +1,51 @@
+<streams>
+
+<immutable_stream name="basicmesh"
+                  type="none"
+                  filename_template="not-to-be-used.nc"
+/>
+
+<immutable_stream name="input"
+                  type="input"
+                  filename_template="landice_grid.nc"
+                  input_interval="initial_only"/>
+
+<immutable_stream name="restart"
+                  type="input;output"
+                  filename_template="restart.$Y-$M-$D_$h.$m.$s.nc"
+                  filename_interval="output_interval"
+                  precision="double"
+                  reference_time="0000-01-01_00:00:00"
+                  clobber_mode="replace_files"
+                  input_interval="initial_only"
+                  output_interval="5000-00-00_00:00:00"/>
+
+<stream name="output"
+        type="output"
+        filename_template="output.nc"
+        filename_interval="none"
+        precision="double"
+        reference_time="0000-01-01_00:00:00"
+        clobber_mode="replace_files"
+        output_interval="0500-00-00_00:00:00">
+
+    <stream name="basicmesh"/>
+    <var_array name="tracers"/>
+    <var name="xtime"/>
+    <var name="thickness"/>
+    <var name="layerThickness"/>
+    <var name="lowerSurface"/>
+    <var name="upperSurface"/>
+    <var name="cellMask"/>
+    <var name="edgeMask"/>
+    <var name="vertexMask"/>
+    <var name="normalVelocity"/>
+    <var name="uReconstructX"/>
+    <var name="uReconstructY"/>
+    <var name="uReconstructZ"/>
+    <var name="uReconstructZonal"/>
+    <var name="uReconstructMeridional"/>
+
+</stream>
+
+</streams>
