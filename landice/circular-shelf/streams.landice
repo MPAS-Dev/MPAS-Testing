@@ -33,6 +33,8 @@
     <var_array name="tracers"/>
     <var name="xtime"/>
     <var name="thickness"/>
+    <var name="bedTopography"/>
+    <var name="layerCenterSigma"/>
     <var name="layerThickness"/>
     <var name="lowerSurface"/>
     <var name="upperSurface"/>
