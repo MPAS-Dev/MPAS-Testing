@@ -7,7 +7,7 @@
 
 <immutable_stream name="input"
                   type="input"
-                  filename_template="eismint2a.input.nc"
+                  filename_template="eismint2d.input.nc"
                   input_interval="initial_only"/>
 
 <immutable_stream name="restart"
@@ -22,7 +22,7 @@
 
 <stream name="output"
         type="output"
-        filename_template="eismint2a.output.nc"
+        filename_template="eismint2d.output.nc"
         filename_interval="none"
         precision="double"
         reference_time="0000-01-01_00:00:00"
@@ -34,7 +34,6 @@
     <var name="xtime"/>
     <var name="thickness"/>
     <var name="layerThickness"/>
-    <var name="bedTopography"/>
     <var name="lowerSurface"/>
     <var name="upperSurface"/>
     <var name="cellMask"/>

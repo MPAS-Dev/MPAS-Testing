@@ -1,0 +1,29 @@
+EISMINT-2 Test Cases
+
+
+*** Included files:
+
+* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the test case.  It needs to be renamed to 'namelist.input' to run periodic_hex if mesh needs to be generated.  If you downloaded a tar archive of this test case, you do not need to create the mesh and can ignore this file.
+
+* setup_initial_conditions_EISMINT2.py
+This file is used to setup the initial conditions for the test case.  Run it with the -e option to choose which experiment to setup.  Valid experiments are A-D, F.
+
+
+*** In each experiment directory:
+
+* namelist.landice is used for running the  MPAS land ice core. 
+
+* streams.landice is used for specifying file input/output settings for the model.
+
+
+*** Instructions:
+Run './setup_initial_conditions_EISMINT2.py -e EXP' where EXP is the experiment name to setup the simulation initial condition in the corresponding subdirectory.
+
+Symlink or copy the landice_model executable into this directory and then change to the directory of the experiment you would like to run.  Execute the model from there:
+> ../landice_model                (for a 1 processor job)
+> mpirun -np 4 ../landice_model   (for a 4 processor job)
+
+
+For details of the tests, see: 
+Payne, A. J., Huybrechts, P., Calov, R., Fastook, J. L., Greve, R., Marshall, S. J., Marsiat, I., Ritz, C., Tarasov, L. and Thomassen, M. P. A.: Results from the EISMINT model intercomparison: the effects of thermomechanical coupling, J. Glaciol., 46(153), 227-238, 2000.
+
