@@ -34,6 +34,7 @@ try:
     normalVelocity = gridfile.variables['normalVelocity']
     layerThicknessFractions = gridfile.variables['layerThicknessFractions']
     temperature = gridfile.variables['temperature']
+    cellsOnCell= gridfile.variables['cellsOnCell']
     # Get b.c. variables
     SMB = gridfile.variables['sfcMassBal']
 except:
@@ -75,10 +76,12 @@ thickness[0,:] = thickness_field
 # flat bed at -2000 m everywhere with a single grounded point
 bedTopography[:] = -2000.0  
 bedTopography[centerCellIndex] = -880.0
+#bedTopography[cellsOnCell[centerCellIndex,:]-1] = -880.0  # use this to make the grounded area 7 cells instead of 1
 
 # beta is 0 everywhere except a high value in the grounded cell
 beta[:] = 0.
 beta[centerCellIndex] = 1.0e8
+#beta[cellsOnCell[centerCellIndex,:]-1] = 1.0e8 # use this to make the grounded area 7 cells instead of 1
 
 # zero velocity everywhere
 normalVelocity[:] = 0.0
