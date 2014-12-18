@@ -42,7 +42,6 @@ lowerSurface = f.variables['lowerSurface']
 upperSurface = f.variables['upperSurface']
 normalVelocity = f.variables['normalVelocity']
 uReconstructX = f.variables['uReconstructX']
-uReconstructX = f.variables['uReconstructX']
 uReconstructY = f.variables['uReconstructY']
 layerCenterSigma = f.variables['layerCenterSigma'][:]
 
@@ -52,6 +51,7 @@ time_length = times.shape[0]
 
 
 velnorm = (uReconstructX[:]**2 + uReconstructY[:]**2)**0.5 * secInYr
+print "Maximum velocity (m/yr) at cell centers in domain:", velnorm.max()
 
 var_slice = thickness[time_slice,:]
 # var_slice = var_slice.reshape(time_length, ny, nx)
@@ -74,6 +74,7 @@ plt.title('basal speed (m/yr)' )
 plt.draw()
 if options.saveimages:
         plt.savefig('circ_shelf_velos.png')
+
 
 
 ##################
