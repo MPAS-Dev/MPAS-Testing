@@ -1,0 +1,40 @@
+&velocity_solver
+	config_velocity_solver = "FO"
+/
+&advection
+/
+&physical_parameters
+	config_ice_density = 910.0
+!	config_default_flowParamA = 4.3905866e-24
+	config_default_flowParamA = 1.8074581e-25
+	config_dynamic_thickness = 10.0
+/
+&time_integration
+        config_dt = '0000-06-00_00:00:00'
+        config_time_integration = 'forward_euler'
+/
+&time_management
+	config_do_restart = .false.
+        config_restart_timestamp_name = 'restart_timestamp'
+	config_start_time = "0000-01-01_00:00:00"
+	config_stop_time = "0000-01-01_00:00:00"
+	config_run_duration = "none"
+	config_calendar_type = "gregorian_noleap"
+/
+&io
+	config_write_output_on_startup = .true.
+	config_pio_num_iotasks = 0
+	config_pio_stride = 1
+        config_year_digits = 4
+/
+&decomposition
+	config_num_halos = 2
+	config_block_decomp_file_prefix = "graph.info.part."
+	config_number_of_blocks = 0
+	config_explicit_proc_decomp = .false.
+	config_proc_decomp_file_prefix = "graph.info.part."
+/
+&debug
+	config_print_thickness_advection_info = .false.
+        config_always_compute_fem_grid = .false.
+/
