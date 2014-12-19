@@ -1,5 +1,7 @@
 Confined Shelf Test Case
 
+See http://homepages.vub.ac.be/~phuybrec/eismint/shelf-descr.pdf for description, specifically experiment 3.
+
 Included files:
 * namelist.input.periodic_hex is used for running periodic_hex to create a grid for the test case.  It needs to be renamed to 'namelist.input' to run periodic_hex if mesh needs to be generated.  If you downloaded a tar archive of this test case, you do not need to create the mesh and can ignore this file.
 
