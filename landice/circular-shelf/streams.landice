@@ -34,7 +34,7 @@
     <var name="xtime"/>
     <var name="thickness"/>
     <var name="bedTopography"/>
-    <var name="layerCenterSigma"/>
+    <var name="layerInterfaceSigma"/>
     <var name="layerThickness"/>
     <var name="lowerSurface"/>
     <var name="upperSurface"/>

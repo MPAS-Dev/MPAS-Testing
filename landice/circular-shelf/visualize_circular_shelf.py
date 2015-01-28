@@ -43,7 +43,7 @@ upperSurface = f.variables['upperSurface']
 normalVelocity = f.variables['normalVelocity']
 uReconstructX = f.variables['uReconstructX']
 uReconstructY = f.variables['uReconstructY']
-layerCenterSigma = f.variables['layerCenterSigma'][:]
+layerInterfaceSigma = f.variables['layerInterfaceSigma'][:]
 
 vert_levs = len(f.dimensions['nVertLevels'])
 
@@ -53,8 +53,6 @@ time_length = times.shape[0]
 velnorm = (uReconstructX[:]**2 + uReconstructY[:]**2)**0.5 * secInYr
 print "Maximum velocity (m/yr) at cell centers in domain:", velnorm.max()
 
-var_slice = thickness[time_slice,:]
-# var_slice = var_slice.reshape(time_length, ny, nx)
 
 ##################
 # FIGURE: Map view surface and bed velocity
@@ -87,11 +85,13 @@ fig = plt.figure(2)
 indXsect = np.where(yCell == 0.0)[0]
 indXsectIce = np.where(np.logical_and(yCell == 0.0, thickness[time_slice,:]>0.0))[0]
 
-plt.contourf(np.tile(xCell[indXsectIce], (vert_levs,1)).transpose(), 
-   (np.tile(thickness[time_slice, indXsectIce], (vert_levs,1))* np.tile(layerCenterSigma, (len(indXsectIce),1)).transpose() + lowerSurface[time_slice, indXsectIce]).transpose(), 
+# contour speed across the cross-section
+plt.contourf(np.tile(xCell[indXsectIce], (vert_levs+1,1)).transpose(), 
+   (np.tile(thickness[time_slice, indXsectIce], (vert_levs+1,1))* np.tile(layerInterfaceSigma, (len(indXsectIce),1)).transpose() + lowerSurface[time_slice, indXsectIce]).transpose(), 
    velnorm[time_slice,indXsectIce,:], 100)
-plt.plot(np.tile(xCell[indXsectIce], (vert_levs,1)).transpose(), 
-   (np.tile(thickness[time_slice, indXsectIce], (vert_levs,1))* np.tile(layerCenterSigma, (len(indXsectIce),1)).transpose() + lowerSurface[time_slice, indXsectIce]).transpose(),
+# plot x's at the velocity data locations
+plt.plot(np.tile(xCell[indXsectIce], (vert_levs+1,1)).transpose(), 
+   (np.tile(thickness[time_slice, indXsectIce], (vert_levs+1,1))* np.tile(layerInterfaceSigma, (len(indXsectIce),1)).transpose() + lowerSurface[time_slice, indXsectIce]).transpose(),
     'kx')#, label='velocity points')
 cbar=plt.colorbar()
 cbar.set_label('speed (m/yr)', rotation=270)
