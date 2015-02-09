@@ -10,6 +10,7 @@
                   filename_template="landice_grid.nc"
                   input_interval="initial_only"/>
 
+
 <immutable_stream name="restart"
                   type="input;output"
                   filename_template="restart.$Y-$M-$D_$h.$m.$s.nc"
@@ -18,7 +19,7 @@
                   reference_time="0000-01-01_00:00:00"
                   clobber_mode="replace_files"
                   input_interval="initial_only"
-                  output_interval="0100-00-00_00:00:00"/>
+                  output_interval="0010-00-00_00:00:00"/>
 
 <stream name="output"
         type="output"
@@ -27,27 +28,31 @@
         precision="double"
         reference_time="0000-01-01_00:00:00"
         clobber_mode="replace_files"
-        output_interval="0010-00-00_00:00:00">
+        output_interval="0001-00-00_00:00:00">
 
     <stream name="basicmesh"/>
     <var_array name="tracers"/>
     <var name="xtime"/>
     <var name="thickness"/>
-    <var name="bedTopography"/>
-    <var name="layerInterfaceSigma"/>
     <var name="layerThickness"/>
     <var name="lowerSurface"/>
     <var name="upperSurface"/>
+<!--
     <var name="cellMask"/>
     <var name="edgeMask"/>
     <var name="vertexMask"/>
+    <var name="floatingEdges"/>
+-->
     <var name="normalVelocity"/>
     <var name="uReconstructX"/>
     <var name="uReconstructY"/>
     <var name="uReconstructZ"/>
-    <var name="uReconstructZonal"/>
-    <var name="uReconstructMeridional"/>
-
+    <var name="beta"/>
+    <var name="layerInterfaceSigma"/>
+    <var name="bedTopography"/>
+    <var name="surfaceSpeed"/>
+    <var name="basalSpeed"/> 
+    <var name="dirichletVelocityMask"/>
 </stream>
 
 </streams>
