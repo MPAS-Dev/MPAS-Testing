@@ -35,18 +35,18 @@
     <var name="thickness"/>
     <var name="bedTopography"/>
     <var name="layerCenterSigma"/>
-    <var name="layerThickness"/>
     <var name="lowerSurface"/>
     <var name="upperSurface"/>
     <var name="cellMask"/>
     <var name="edgeMask"/>
     <var name="vertexMask"/>
+    <var name="floatingEdges"/>
     <var name="normalVelocity"/>
     <var name="uReconstructX"/>
     <var name="uReconstructY"/>
-    <var name="uReconstructZ"/>
-    <var name="uReconstructZonal"/>
-    <var name="uReconstructMeridional"/>
+    <var name="surfaceSpeed"/>
+    <var name="basalSpeed"/>
+    <var name="dirichletVelocityMask"/>
 
 </stream>
 

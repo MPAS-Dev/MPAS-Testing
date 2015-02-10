@@ -1,6 +1,6 @@
 &periodic_grid
-   nx = 47,
-   ny = 54,
+   nx = 50,
+   ny = 58,
    dc = 5000.,
    nVertLevels = 10,
    nTracers = 1,

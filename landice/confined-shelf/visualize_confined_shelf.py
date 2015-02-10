@@ -7,6 +7,7 @@ import numpy as np
 from netCDF4 import Dataset as NetCDFFile
 from optparse import OptionParser
 import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
 # from matplotlib.contour import QuadContourSet
 
 
@@ -14,9 +15,6 @@ parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename", help="file to visualize", metavar="FILE")
 parser.add_option("-s", "--save", action="store_true", dest="saveimages", help="include this flag to save plots as files")
 parser.add_option("-n", "--nodisp", action="store_true", dest="hidefigs", help="include this flag to not display plots (usually used with -s)")
-# parser.add_option("-v", "--var", dest="variable", help="variable to visualize", metavar="VAR")
-# parser.add_option("--max", dest="maximum", help="maximum for color bar", metavar="MAX")
-# parser.add_option("--min", dest="minimum", help="minimum for color bar", metavar="MIN")
 
 options, args = parser.parse_args()
 
@@ -39,7 +37,7 @@ def contourMPAS(field, contour_levs):
   yi = np.linspace(xCell.min(), yCell.max(), numrows)
   xi, yi = np.meshgrid(xi, yi)
   #-- Interpolate at the points in xi, yi
-  zi = griddata(xCell, yCell, field, xi, yi)
+  zi = griddata( (xCell, yCell), field, (xi, yi) )
   #-- Display the results
   im = plt.contour(xi, yi, zi, contour_levs)
   #plt.scatter(xCell, yCell, c=temperature[timelev,:,-1], s=100, vmin=zi.min(), vmax=zi.max())  # to see the raw data on top
@@ -66,14 +64,15 @@ normalVelocity = f.variables['normalVelocity']
 uReconstructX = f.variables['uReconstructX']
 uReconstructY = f.variables['uReconstructY']
 layerCenterSigma = f.variables['layerCenterSigma'][:]
+nCells = len(f.dimensions['nCells'])
 
 vert_levs = len(f.dimensions['nVertLevels'])
 
 time_length = times.shape[0]
 
 
-velnorm = (uReconstructX[:]**2 + uReconstructY[:]**2)**0.5 * secInYr
-print "Maximum velocity (m/yr) at cell centers in domain:", velnorm.max()
+velnorm = (uReconstructX[:]**2 + uReconstructY[:]**2)**0.5
+print "Maximum speed (m/yr) at cell centers in domain:", velnorm.max() * secInYr
 
 var_slice = thickness[time_slice,:]
 # var_slice = var_slice.reshape(time_length, ny, nx)
@@ -83,13 +82,13 @@ var_slice = thickness[time_slice,:]
 ##################
 fig = plt.figure(1)
 ax = fig.add_subplot(121, aspect='equal')
-plt.scatter(xCell[:], yCell[:], 80, velnorm[time_slice,:,0], marker='h', edgecolors='none')
+plt.scatter(xCell[:], yCell[:], 80, velnorm[time_slice,:,0] * secInYr, marker='h', edgecolors='none')
 plt.colorbar()
 plt.quiver(xCell[:], yCell[:], uReconstructX[time_slice,:, 0] * secInYr, uReconstructY[time_slice,:, 0] * secInYr )
 plt.title('surface speed (m/yr)' )
 plt.draw()
 ax = fig.add_subplot(122, aspect='equal')
-plt.scatter(xCell[:], yCell[:], 80, velnorm[time_slice,:,-1], marker='h', edgecolors='none')
+plt.scatter(xCell[:], yCell[:], 80, velnorm[time_slice,:,-1] * secInYr, marker='h', edgecolors='none')
 plt.colorbar()
 plt.quiver(xCell[:], yCell[:], uReconstructX[time_slice,:, -1] * secInYr, uReconstructY[time_slice,:, -1] * secInYr )
 plt.title('basal speed (m/yr)' )
@@ -105,7 +104,7 @@ if options.saveimages:
 fig = plt.figure(2, facecolor='w')
 
 fig.add_subplot(121)
-contourMPAS(uReconstructX[timelev,:,0]*secInYr, np.linspace(-200.0, 200.0, 400.0/20.0+1))
+contourMPAS(uReconstructX[time_slice,:,0]*secInYr, np.linspace(-200.0, 200.0, 400.0/20.0+1))
 plt.axis('equal')
 plt.title('Horizontal x-velocity (m/a)')
 plt.xlim( (0.0, 200.0) ); plt.ylim( (0.0, 200.0) )
@@ -113,7 +112,7 @@ plt.xlabel('X position (km)')
 plt.ylabel('Y position (km)')
 
 fig.add_subplot(122)
-contourMPAS(uReconstructY[timelev,:,0]*secInYr, np.linspace(-1000.0, 0.0, 1000.0/100.0+1))
+contourMPAS(uReconstructY[time_slice,:,0]*secInYr, np.linspace(-1000.0, 0.0, 1000.0/100.0+1))
 plt.axis('equal')
 plt.title('Horizontal y-velocity (m/a)')
 plt.xlim( (0.0, 200.0) ); plt.ylim( (0.0, 200.0) )

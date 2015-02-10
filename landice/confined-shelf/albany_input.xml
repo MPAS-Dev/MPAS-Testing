@@ -1,18 +1,7 @@
 <ParameterList>
 <ParameterList name="Problem">
-<Parameter name="Phalanx Graph Visualization Detail" type="int" value="1"/>
-<Parameter name="Solution Method" type="string" value="Continuation"/>
+<Parameter name="Solution Method" type="string" value="Steady"/>
 <Parameter name="Name" type="string" value="FELIX Stokes First Order 3D"/>
-<ParameterList name="Dirichlet BCs">
-<!--Parameter name="DBC on NS Bottom for DOF U0" type="double" value="0.0"/-->
-<!--Parameter name="DBC on NS Bottom for DOF U1" type="double" value="0.0"/-->
-</ParameterList>
-<ParameterList name="Neumann BCs">
-<Parameter name="NBC on SS basalside for DOF all set basal" type="Array(double)" value="{1e7., 0., 0., 0., 0.}"/>
-<Parameter name="NBC on SS lateralside for DOF all set lateral" type="Array(double)" value="{1e7., 0., 0., 0., 0.}"/>
-<Parameter name="BetaXY" type="string" value="Scalar Field"/>
-<Parameter name="Cubature Degree" type="int" value="3"/>
-</ParameterList>
 <ParameterList name="Parameters">
 <Parameter name="Number" type="int" value="1"/>
 <Parameter name="Parameter 0" type="string" value="Glen's Law Homotopy Parameter"/>

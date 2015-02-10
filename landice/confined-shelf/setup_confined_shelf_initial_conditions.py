@@ -6,6 +6,7 @@ import sys
 from netCDF4 import Dataset
 from math import sqrt
 import numpy as np
+from collections import Counter
 
 # Parse options
 from optparse import OptionParser
@@ -23,8 +24,8 @@ try:
     nCells = len(gridfile.dimensions['nCells'])
     nVertLevels = len(gridfile.dimensions['nVertLevels'])
     maxEdges = len(gridfile.dimensions['maxEdges'])
-    if nVertLevels != 10:
-         print 'nVerLevels in the supplied file was ', nVertLevels, '.  Were you expecting 10?'
+    if nVertLevels != 5:
+         print 'nVerLevels in the supplied file was ', nVertLevels, '.  5 levels are typically used with this test case.'
     # Get variables
     xCell = gridfile.variables['xCell']
     yCell = gridfile.variables['yCell']
@@ -35,11 +36,13 @@ try:
     thickness = gridfile.variables['thickness']
     bedTopography = gridfile.variables['bedTopography']
     beta = gridfile.variables['beta']
-    normalVelocity = gridfile.variables['normalVelocity']
     layerThicknessFractions = gridfile.variables['layerThicknessFractions']
     temperature = gridfile.variables['temperature']
     cellsOnCell= gridfile.variables['cellsOnCell']
     # Get b.c. variables
+    kinbcmask = gridfile.variables['dirichletVelocityMask']
+    uvel = gridfile.variables['uReconstructX']
+    vvel = gridfile.variables['uReconstructY']
     SMB = gridfile.variables['sfcMassBal']
 except:
     sys.exit('Error: The grid file specified is either missing or lacking needed dimensions/variables.')
@@ -47,27 +50,29 @@ except:
 
 
 # put the domain origin in the center of the center cell in the x-direction and in the 2nd row on the y-direction
-unique_xs=np.array(sorted(list(set(xCell[:]))))
-targetx = (unique_xs.max() - unique_xs.min()) / 2.0 + unique_xs.min()  # center of domain range
-best_x=unique_xs[ np.absolute((unique_xs - targetx)) == np.min(np.absolute(unique_xs - (targetx))) ][0]
-print 'Found a best x value to use of:' + str(best_x)
+# Only do this if it appears this has not already been done:
+if xVertex[:].min() == 0.0:
+   print 'Shifting domain origin to center of shelf front, because it appears that this has not yet been done.'
+   unique_xs=np.array(sorted(list(set(xCell[:]))))
+   targetx = (unique_xs.max() - unique_xs.min()) / 2.0 + unique_xs.min()  # center of domain range
+   best_x=unique_xs[ np.absolute((unique_xs - targetx)) == np.min(np.absolute(unique_xs - (targetx))) ][0]
+   print 'Found a best x value to use of:' + str(best_x)
+   
+   unique_ys=np.array(sorted(list(set(yCell[:]))))
+#   print unique_ys
+   best_y = unique_ys[5]  # get 6th value
+   print 'Found a best y value to use of:' + str(best_y)
+   
+   xShift = -1.0 * best_x
+   yShift = -1.0 * best_y
+   xCell[:] = xCell[:] + xShift
+   yCell[:] = yCell[:] + yShift
+   xEdge[:] = xEdge[:] + xShift
+   yEdge[:] = yEdge[:] + yShift
+   xVertex[:] = xVertex[:] + xShift
+   yVertex[:] = yVertex[:] + yShift
 
-unique_ys=np.array(sorted(list(set(yCell[:]))))
-print unique_ys
-best_y = unique_ys[2]  # get 3nd value
-print 'Found a best y value to use of:' + str(best_y)
-
-xShift = -1.0 * best_x
-yShift = -1.0 * best_y
-xCell[:] = xCell[:] + xShift
-yCell[:] = yCell[:] + yShift
-xEdge[:] = xEdge[:] + xShift
-yEdge[:] = yEdge[:] + yShift
-xVertex[:] = xVertex[:] + xShift
-yVertex[:] = yVertex[:] + yShift
-
-
-print np.array(sorted(list(set(yCell[:]))))
+#   print np.array(sorted(list(set(yCell[:]))))
 
 # Make a square ice mass
 # Define square dimensions - all in meters
@@ -95,18 +100,22 @@ bedTopography[np.nonzero(shelfMask==1)[0]] = -2000.0
 bedTopography[np.nonzero(shelfMask==0)[0]] = -440.0
 
 # Dirichlet velocity mask
-# veloBCmask[:] = 0
-# veloBCmask[np.nonzero(shelfMask==0)[0]] = 1
+kinbcmask[:] = 0
+#kinbcmask[:, np.nonzero(shelfMask==0)[0], :] = 1
+kinbcmask[:, np.nonzero(np.logical_and(shelfMask==0, shelfMaskWithGround==1))[0], :] = 1
+#kinbcmask[:, np.nonzero(yCell[:]<0.0)[0] ] = 0
+# Need to extend this mask south by one cell so that the extended FEM mask will still have the 0 velo on the edges...
+theSides = Counter(xCell[ np.nonzero(kinbcmask[0,:])[0] ]).most_common(4)  # need the 4 most common x positions.
+for side in theSides:
+    thesideindices = np.nonzero( np.logical_and( xCell[:] == side[0] , yCell[:] <= 0.0 ) )[0]
+    kinbcmask[:, thesideindices] = 1
 
 # Dirichlet velocity values
-# uReconstructX[:] = 0
-# uReconstructY[:] = 0
+uvel[:] = 0
+vvel[:] = 0
 
 # beta is 0 everywhere (strictly speaking it should not be necessary to set this)
 beta[:] = 0.
-
-# zero velocity everywhere
-normalVelocity[:] = 0.0
 
 # constant, arbitrary temperature, degrees C
 temperature[:] = 273.15 
