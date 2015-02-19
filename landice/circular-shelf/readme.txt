@@ -1,7 +1,7 @@
 Circular Shelf Test Case
 
 Included files:
-* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the dome test case.  It needs to be renamed to 'namelist.input' to run periodic_hex) if mesh needs to be generated.  If you downloaded a tar archive of this test case, you do not need to create the mesh and can ignore this file.
+* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the dome test case.  It needs to be renamed to 'namelist.input' to run periodic_hex) if mesh needs to be generated.  Note that If you downloaded a tar archive of this test case, you do not need to create the mesh and therefor this file is not included.  
 
 * setup_circular_shelf_initial_conditions.py
 To setup the initial conditions once a landice_grid.nc has been created use:

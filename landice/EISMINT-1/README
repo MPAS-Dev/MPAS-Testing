@@ -9,7 +9,7 @@ Included files:
 * check_output_eismint-mm1.py
 This script can be used to compare model output to results from the EISMINT intercomparison.
 
-* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the test case.  It needs to be renamed to 'namelist.input' to run periodic_hex) if mesh needs to be generated.  If you downloaded a tar archive of this test case, you do not need to create the mesh and can ignore this file.
+* namelist.input.periodic_hex is used for running periodic_hex to create a grid for the test case.  It needs to be renamed to 'namelist.input' to run periodic_hex) if mesh needs to be generated.  Note that If you downloaded a tar archive of this test case, you do not need to create the mesh and therefor this file is not included.  
 
 * setup_initial_conditions_EISMINT1-MovingMargin-1.py
 This file can be used to setup the initial conditions for the test case.  If you downloaded a tar archive, you do not need to do this.  However, if you want to modify the IC for some reason, you can edit and run this script.
