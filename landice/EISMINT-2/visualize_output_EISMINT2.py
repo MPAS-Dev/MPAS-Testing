@@ -66,9 +66,9 @@ def contourMPAS(field, contour_levs):
   #-- Now let's grid your data.
   # First we'll make a regular grid to interpolate onto. 
   numcols, numrows = nCells**0.5, nCells**0.5  # may want to adjust the density of the regular grid
-  xi = np.linspace(xCell.min(), xCell.max(), numcols)
-  yi = np.linspace(xCell.min(), yCell.max(), numrows)
-  xi, yi = np.meshgrid(xi, yi)
+  xc = np.linspace(xCell.min(), xCell.max(), numcols)
+  yc = np.linspace(yCell.min(), yCell.max(), numrows)
+  xi, yi = np.meshgrid(xc, yc)
   #-- Interpolate at the points in xi, yi
   zi = griddata(xCell, yCell, field, xi, yi)
   #-- Display the results
