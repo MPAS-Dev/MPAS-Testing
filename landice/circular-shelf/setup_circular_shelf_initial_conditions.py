@@ -9,6 +9,8 @@ from math import sqrt
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename", type='string', help="file in which to setup circular shelf", metavar="FILE")
+parser.add_option("-b","--beta", dest="use_beta", action="store_true", help="Use this flag to use a high value of the field 'beta' to specify 'no-slip' conditions in the grounded portion of the domain.  The default is to use Dirichlet boundary conditions.")
+parser.add_option("-7","--7cells", dest="use_7cells", action="store_true", help="Use this flag to create 7 grounded cells (the center cell and its 6 neigbors).  The default is to only ground the center cell.")
 options, args = parser.parse_args()
 if not options.filename:
    options.filename = 'landice_grid.nc'
@@ -19,8 +21,8 @@ if not options.filename:
 try:
     gridfile = Dataset(options.filename,'r+')
     nVertLevels = len(gridfile.dimensions['nVertLevels'])
-    if nVertLevels != 10:
-         print 'nVerLevels in the supplied file was ', nVertLevels, '.  Were you expecting 10?'
+    if nVertLevels != 5:
+         print 'nVerLevels in the supplied file was ', nVertLevels, '.  This test case is typically run with 5 levels.'
     # Get variables
     xCell = gridfile.variables['xCell']
     yCell = gridfile.variables['yCell']
@@ -30,10 +32,9 @@ try:
     yVertex = gridfile.variables['yVertex']
     thickness = gridfile.variables['thickness']
     bedTopography = gridfile.variables['bedTopography']
-    beta = gridfile.variables['beta']
-    normalVelocity = gridfile.variables['normalVelocity']
     layerThicknessFractions = gridfile.variables['layerThicknessFractions']
     temperature = gridfile.variables['temperature']
+    cellsOnCell= gridfile.variables['cellsOnCell']
     # Get b.c. variables
     SMB = gridfile.variables['sfcMassBal']
 except:
@@ -41,27 +42,30 @@ except:
 
 
 
-# Find center of domain
-x0 = xCell[:].min() + 0.5 * (xCell[:].max() - xCell[:].min() )
-y0 = yCell[:].min() + 0.5 * (yCell[:].max() - yCell[:].min() )
-# Calculate distance of each cell center from dome center
-r = ((xCell[:] - x0)**2 + (yCell[:] - y0)**2)**0.5
-
 # Center the dome in the center of the cell that is closest to the center of the domain.
-centerCellIndex = numpy.abs(r[:]).argmin()
-#print x0, y0, centerCellIndex, xCell[centerCellIndex], yCell[centerCellIndex]
-xShift = -1.0 * xCell[centerCellIndex]
-yShift = -1.0 * yCell[centerCellIndex]
-xCell[:] = xCell[:] + xShift
-yCell[:] = yCell[:] + yShift
-xEdge[:] = xEdge[:] + xShift
-yEdge[:] = yEdge[:] + yShift
-xVertex[:] = xVertex[:] + xShift
-yVertex[:] = yVertex[:] + yShift
-# Now update origin location and distance array
+# Only do this if it appears this has not already been done:
+if xVertex[:].min() == 0.0:
+   print "Shifting x/y coordinates to center domain at 0,0."
+   # Find center of domain
+   x0 = xCell[:].min() + 0.5 * (xCell[:].max() - xCell[:].min() )
+   y0 = yCell[:].min() + 0.5 * (yCell[:].max() - yCell[:].min() )
+   # Calculate distance of each cell center from dome center
+   r = ((xCell[:] - x0)**2 + (yCell[:] - y0)**2)**0.5
+   centerCellIndex = numpy.abs(r[:]).argmin()
+  #print x0, y0, centerCellIndex, xCell[centerCellIndex], yCell[centerCellIndex]
+   xShift = -1.0 * xCell[centerCellIndex]
+   yShift = -1.0 * yCell[centerCellIndex]
+   xCell[:] = xCell[:] + xShift
+   yCell[:] = yCell[:] + yShift
+   xEdge[:] = xEdge[:] + xShift
+   yEdge[:] = yEdge[:] + yShift
+   xVertex[:] = xVertex[:] + xShift
+   yVertex[:] = yVertex[:] + yShift
+# Now update our local values of the origin location and distance array (or assume these are correct because this grid has previously been shifted
 x0 = 0.0
 y0 = 0.0
 r = ((xCell[:] - x0)**2 + (yCell[:] - y0)**2)**0.5
+centerCellIndex = numpy.abs(r[:]).argmin()
 
 # Make a circular ice mass
 # Define dome dimensions - all in meters
@@ -75,13 +79,33 @@ thickness[0,:] = thickness_field
 # flat bed at -2000 m everywhere with a single grounded point
 bedTopography[:] = -2000.0  
 bedTopography[centerCellIndex] = -880.0
+if options.use_7cells:
+   print 'Making the grounded portion of the domain cover 7 cells - the center cell and its 6 neighbors.'
+   bedTopography[cellsOnCell[centerCellIndex,:]-1] = -880.0  # use this to make the grounded area 7 cells instead of 1
+else:
+   print 'Making the grounded portion of the domain cover 1 cell - the center cell.'
 
-# beta is 0 everywhere except a high value in the grounded cell
-beta[:] = 0.
-beta[centerCellIndex] = 1.0e8
+if options.use_beta:
+   print 'Setting no-slip on the grounded portion of the domain by setting a high beta field there.'
+   beta = gridfile.variables['beta']
+   # beta is 0 everywhere except a high value in the grounded cell
+   beta[:] = 0.
+   beta[centerCellIndex] = 1.0e8
+   if options.use_7cells:
+      beta[cellsOnCell[centerCellIndex,:]-1] = 1.0e8 # use this to make the grounded area 7 cells instead of 1
+else: # use Dirichlet b.c.
+   print 'Setting no-slip on the grounded portion of the domain by setting no-slip Dirichlet velocity boundary conditions there.'
+   dirMask = gridfile.variables['dirichletVelocityMask']
+   uvel = gridfile.variables['uReconstructX']
+   vvel = gridfile.variables['uReconstructY']
+   dirMask[:] = 0
+   uvel[:] = 0.0
+   vvel[:] = 0.0
+   # Apply mask to basal level of grounded portion only
+   dirMask[:, centerCellIndex, -1] = 1
+   if options.use_7cells:
+      dirMask[:, cellsOnCell[centerCellIndex,:]-1, -1] = 1
 
-# zero velocity everywhere
-normalVelocity[:] = 0.0
 # constant, arbitrary temperature, degrees C
 temperature[:] = 273.15 
 # Setup layerThicknessFractions
@@ -93,7 +117,7 @@ SMB[:] = SMB[:] *910.0/(3600.0*24.0*365.0)
 
 gridfile.close()
 
-print 'Successfully added circular-shelf initial conditions to: ', options.filename
+print '\nSuccessfully added circular-shelf initial conditions to: ', options.filename
 
 
 
