@@ -1,3 +1,10 @@
+MISMIP3D Test Case
+
+For Description:
+http://homepages.ulb.ac.be/~fpattyn/mismip3d/
+http://www.ingentaconnect.com/content/igsoc/jog/2013/00000059/00000215/art00002
+
+
 How to create MISMIP3D initial condition input file
 ------------------------------------------------------
 

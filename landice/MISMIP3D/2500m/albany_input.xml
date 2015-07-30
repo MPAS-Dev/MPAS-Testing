@@ -9,11 +9,12 @@
 <ParameterList name="FELIX Viscosity">
 <Parameter name="Type" type="string" value="Glen's Law"/>
 <!--
-<Parameter name="Flow Rate Type" type="string" value="Uniform"/>
--->
 <Parameter name="Flow Rate Type" type="string" value="Temperature Based"/>
+-->
+<Parameter name="Flow Rate Type" type="string" value="Uniform"/>
 <Parameter name="Glen's Law Homotopy Parameter" type="double" value="1"/>
-<Parameter name="Glen's Law A" type="double" value="0.0001"/>
+<!-- Note that because of the units used in Albany, the value for A in input file is 10^12 times the usual value in Pa^{-n} yr^{-1}. -->
+<Parameter name="Glen's Law A" type="double" value="0.0000031536"/>
 <Parameter name="Glen's Law n" type="double" value="3"/>
 </ParameterList>
 <ParameterList name="Body Force">
