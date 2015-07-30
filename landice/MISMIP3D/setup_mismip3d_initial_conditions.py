@@ -75,7 +75,10 @@ SMB[ np.nonzero(xCell > 800000.0) ] = -100.0
 gridfile.variables['sfcMassBal'][:] = SMB[:]
 
 # Thickness initial condition is no ice.
-gridfile.variables['thickness'][:] = 0.0
+thickness = np.zeros((nCells,))
+thickness[:] = 600.0 # can start with nonzero thickness to get into the action faster.
+thickness[ np.nonzero(xCell > 800000.0) ] = 0.0
+gridfile.variables['thickness'][0,:] = thickness[:]
 
 # For now approximate boundary conditions with 0 velocity.
 # This is not correct.

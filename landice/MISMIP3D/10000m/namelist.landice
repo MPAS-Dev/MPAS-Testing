@@ -11,7 +11,7 @@
     config_dynamic_thickness = 1.0
 /
 &time_integration
-    config_dt = '0000-01-00_00:00:00'
+    config_dt = '0100-00-00_00:00:00'
     config_time_integration = 'forward_euler'
     config_adaptive_timestep = .false.
     config_min_adaptive_timestep = 0.0
@@ -24,7 +24,7 @@
     config_do_restart = .false.
     config_restart_timestamp_name = 'restart_timestamp'
     config_start_time = '0000-01-01_00:00:00'
-    config_stop_time = '0010-12-01_00:00:00'
+    config_stop_time = '10000-12-01_00:00:00'
     config_run_duration = 'none'
     config_calendar_type = 'gregorian_noleap'
 /
@@ -35,7 +35,7 @@
     config_write_output_on_startup = .true.
     config_pio_num_iotasks = 0
     config_pio_stride = 1
-    config_year_digits = 4
+    config_year_digits = 5
     config_output_external_velocity_solver_data = .false.
 /
 &decomposition
@@ -46,7 +46,7 @@
     config_proc_decomp_file_prefix = 'graph.info.part.'
 /
 &debug
-    config_print_thickness_advection_info = .false.
+    config_print_thickness_advection_info = .true.
     config_always_compute_fem_grid = .false.
     config_print_velocity_cleanup_details = .false.
 /

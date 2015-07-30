@@ -38,6 +38,7 @@
 	<var name="normalVelocity"/>
 	<var name="surfaceSpeed"/>
 	<var name="basalSpeed"/>
+        <var name="floatingEdges"/>
 </stream>
 
 </streams>
