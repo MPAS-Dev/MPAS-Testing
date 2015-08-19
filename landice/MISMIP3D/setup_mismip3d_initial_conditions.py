@@ -44,8 +44,8 @@ if yCell.min() > 0.0:
    print 'Found a best y value to use of:' + str(best_y)
    
    unique_xs=np.array(sorted(list(set(xCell[:]))))
-#   print unique_xs
-   best_x = unique_xs[2]  # get 3rd value
+   targetx = (unique_xs.max() - unique_xs.min()) / 2.0 + unique_xs.min()  # center of domain range
+   best_x=unique_xs[ np.absolute((unique_xs - targetx)) == np.min(np.absolute(unique_xs - (targetx))) ][0]
    print 'Found a best x value to use of:' + str(best_x)
    
    xShift = -1.0 * best_x
@@ -63,7 +63,10 @@ if yCell.min() > 0.0:
 
 
 # bed slope defined by b(m)=-100km-x(km)
-gridfile.variables['bedTopography'][:] = -100.0 - xCell/1000.0
+topg = np.zeros((nCells,))
+topg[np.nonzero(xCell>=0.0)]= -100.0 - xCell[np.nonzero(xCell>=0.0)]/1000.0
+topg[np.nonzero(xCell<0.0)] = -100.0 + xCell[np.nonzero(xCell< 0.0)]/1000.0
+gridfile.variables['bedTopography'][:] = topg[:]
 
 # SMB
 SMB = np.zeros((nCells,))
@@ -71,13 +74,14 @@ SMB = np.zeros((nCells,))
 # Convert from units of m/yr to kg/m2/s using appropriate ice density
 SMB[:] = 0.5 *900.0/(3600.0*24.0*365.0)
 # Add a 'gutter' along the eastern edge
-SMB[ np.nonzero(xCell > 800000.0) ] = -100.0
+SMB[ np.nonzero(xCell >  800000.0) ] = -100.0
+SMB[ np.nonzero(xCell < -800000.0) ] = -100.0
 gridfile.variables['sfcMassBal'][:] = SMB[:]
 
 # Thickness initial condition is no ice.
 thickness = np.zeros((nCells,))
 thickness[:] = 600.0 # can start with nonzero thickness to get into the action faster.
-thickness[ np.nonzero(xCell > 800000.0) ] = 0.0
+thickness[ np.nonzero(np.absolute(xCell) > 800000.0) ] = 0.0
 gridfile.variables['thickness'][0,:] = thickness[:]
 
 # For now approximate boundary conditions with 0 velocity.
@@ -86,16 +90,16 @@ gridfile.variables['thickness'][0,:] = thickness[:]
 # north and south boundaries should be no slip lateral boundaries.
 # Dirichlet velocity mask
 kinbcmask = np.zeros((1, nCells, nVertInterfaces))
-kinbcmask[:, np.nonzero(yCell == yCell.min()), : ] = 1 # south row
-kinbcmask[:, np.nonzero(yCell == yCell.max()), : ] = 1 # north row
-kinbcmask[:, np.nonzero(xCell < 0.0), : ] = 1 # west boundary
+kinbcmask[:, np.nonzero(yCell == yCell.min()), : ] = 3 # south row  3=dirichlet set for y-component only
+kinbcmask[:, np.nonzero(yCell == yCell.max()), : ] = 3 # north row
+###kinbcmask[:, np.nonzero(xCell < 0.0), : ] = 1 # west boundary
 gridfile.variables['dirichletVelocityMask'][:] = kinbcmask
 # Dirichlet velocity values
 gridfile.variables['uReconstructX'][:] = 0.0
 gridfile.variables['uReconstructY'][:] = 0.0
 
 # beta is not correct
-gridfile.variables['beta'][:] = 1.0e4
+gridfile.variables['beta'][:] = 1.0e7  # For the basal friction law being used, beta holds the 'C' coefficient in Pa m^-1/3 s^1/3
 
 # constant, arbitrary temperature, K
 gridfile.variables['temperature'][:] = 273.15

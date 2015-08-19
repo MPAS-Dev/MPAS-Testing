@@ -11,9 +11,9 @@
     config_dynamic_thickness = 1.0
 /
 &time_integration
-    config_dt = '0100-00-00_00:00:00'
+    config_dt = '0001-00-00_00:00:00'
     config_time_integration = 'forward_euler'
-    config_adaptive_timestep = .false.
+    config_adaptive_timestep = .true.
     config_min_adaptive_timestep = 0.0
     config_max_adaptive_timestep = 3.15e9
     config_adaptive_timestep_CFL_fraction = 0.25
@@ -22,11 +22,13 @@
 /
 &time_management
     config_do_restart = .false.
-    config_restart_timestamp_name = 'restart_timestamp'
     config_start_time = '0000-01-01_00:00:00'
-    config_stop_time = '10000-12-01_00:00:00'
+!    config_do_restart = .true.
+!    config_start_time = 'file'
+    config_stop_time = '0010-01-01_00:00:00'
     config_run_duration = 'none'
     config_calendar_type = 'gregorian_noleap'
+    config_restart_timestamp_name = 'restart_timestamp'
 /
 &io
     config_stats_interval = 0

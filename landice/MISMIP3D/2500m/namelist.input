@@ -1,8 +1,8 @@
 &periodic_grid
 ! MISMIP3D Elmer output uses 2.5 km spacing.
    dc = 2500.,
-! Domain is 800 km wide, standard hex mesh has dx=dc. so nx=321 + 2 for stripping off periodicity.  Add a few more to make sure we get past 800 km
-   nx = 326,
+! Domain is 800 km wide, standard hex mesh has dx=dc. so nx=321     Double to get both halves.  +2 for stripping off periodicity.  Add a few more to be sure we go past 800 km.
+   nx = 648,
 ! Half domain is 50 km tall but we are not dealing with reflective boundaries, so our domain is 100 km tall. standard hex mesh has dy=0.866*dc.  So ny=48 + 2 for stripping off periodicity.
    ny = 50,
    nVertLevels = 1,
