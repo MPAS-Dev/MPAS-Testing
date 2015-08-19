@@ -80,9 +80,54 @@ gridfile.variables['sfcMassBal'][:] = SMB[:]
 
 # Thickness initial condition is no ice.
 thickness = np.zeros((nCells,))
-thickness[:] = 600.0 # can start with nonzero thickness to get into the action faster.
-thickness[ np.nonzero(np.absolute(xCell) > 800000.0) ] = 0.0
-gridfile.variables['thickness'][0,:] = thickness[:]
+
+thicknessICtype = 2  # 1=uniform, 2=b.l. solution
+if thicknessICtype == 1:
+   thickness[:] = 600.0 # can start with nonzero thickness to get into the action faster.
+   thickness[ np.nonzero(np.absolute(xCell) > 800000.0) ] = 0.0
+   gridfile.variables['thickness'][0,:] = thickness[:]
+elif thicknessICtype == 2:
+   # Integrate Eq. 25 from Schoof 2007 (JGR) from a chosen xg position
+   # Need to choose G.L. position.  Best to not choose the actual solution because at coarse resolution the GL won't move much and we'll get the right answer only because we started there...
+   xg = 500000.1  # m
+   C = 1.0e7    # Pa m^-1/3 s^1/3
+   m = 1.0/3.0
+   a = 0.3/3.14e7  # m/yr converted to m/s
+   rhoi = 900.0  # kg/m3
+   rhow = 1000.0 # kg/m3
+   g = 9.81  #m/s2
+   # calculations:
+   ind = np.logical_and(xCell>=0.0, xCell<=xg)  # indices where xCell is between divide and GL
+   unique_xs=np.array(sorted(list(set(xCell[ind])), reverse=True))  # returns a list of x values from GL to divide (descending)
+   print unique_xs
+#   i0 = np.nonzero(xCell == 0.0)[0][0] # index at divide
+   hg = rhow/rhoi * -1.0*(-100.0 - xg/1000.0)  # thickness at GL
+   print 'xg, hg=', xg, hg
+
+   ig = np.nonzero(np.logical_or(xCell >= xg, xCell <= -xg))[0]  # indices at GL cells and shelf cells
+   thickness[ig] = hg   # make shelf thickness same as GL
+   previous_x = xg
+   previous_h = hg
+
+   dbdx = 1.0/1000.0  # bed slope is uniform
+   for x in unique_xs:
+      q = a * x
+      # first order integration
+      h = previous_h + (dbdx - C/(rhoi*g) * abs(q)**(m-1.0) * q / previous_h**(m+1.0)) * (x - previous_x)
+      if h != h:
+          h = previous_h  # Nan at divide
+      these_x = np.nonzero(xCell == x)[0]  # get the indices we are calculating for
+      other_x = np.nonzero(xCell == -x)[0]  # get the mirror side indices
+#      print x, these_x, xCell[these_x], h
+      thickness[these_x] = h
+      thickness[other_x] = h
+      previous_x = x
+      previous_h = h
+   thickness[thickness != thickness] = 50000.0  # NaN check!
+   thickness[ np.nonzero(np.absolute(xCell) > 800000.0) ] = 0.0
+   gridfile.variables['thickness'][0,:] = thickness[:]
+
+
 
 # For now approximate boundary conditions with 0 velocity.
 # This is not correct.
