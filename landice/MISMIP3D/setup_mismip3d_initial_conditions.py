@@ -89,7 +89,8 @@ if thicknessICtype == 1:
 elif thicknessICtype == 2:
    # Integrate Eq. 25 from Schoof 2007 (JGR) from a chosen xg position
    # Need to choose G.L. position.  Best to not choose the actual solution because at coarse resolution the GL won't move much and we'll get the right answer only because we started there...
-   xg = 500000.1  # m
+   #xg = 500000.1  # m  This is approximately where it should end up, but better not to use this i.c. for the actual experiment.  This is primarily good for testing it doesn't move away from here...
+   xg = 300000.1  # m
    C = 1.0e7    # Pa m^-1/3 s^1/3
    m = 1.0/3.0
    a = 0.3/3.14e7  # m/yr converted to m/s
@@ -105,7 +106,7 @@ elif thicknessICtype == 2:
    print 'xg, hg=', xg, hg
 
    ig = np.nonzero(np.logical_or(xCell >= xg, xCell <= -xg))[0]  # indices at GL cells and shelf cells
-   thickness[ig] = hg   # make shelf thickness same as GL
+   thickness[ig] = hg/2.0   # make shelf thickness same as GL halved - this is reasonably close to the shelf thickness at SS and avoids large velocities (and small CFL time step limits if using the full GL thickness)
    previous_x = xg
    previous_h = hg
 
@@ -135,8 +136,8 @@ elif thicknessICtype == 2:
 # north and south boundaries should be no slip lateral boundaries.
 # Dirichlet velocity mask
 kinbcmask = np.zeros((1, nCells, nVertInterfaces))
-kinbcmask[:, np.nonzero(yCell == yCell.min()), : ] = 3 # south row  3=dirichlet set for y-component only
-kinbcmask[:, np.nonzero(yCell == yCell.max()), : ] = 3 # north row
+kinbcmask[:, np.nonzero(yCell == yCell.min()), : ] = 1 # south row
+kinbcmask[:, np.nonzero(yCell == yCell.max()), : ] = 1 # north row
 ###kinbcmask[:, np.nonzero(xCell < 0.0), : ] = 1 # west boundary
 gridfile.variables['dirichletVelocityMask'][:] = kinbcmask
 # Dirichlet velocity values

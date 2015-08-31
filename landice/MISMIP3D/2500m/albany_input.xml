@@ -6,6 +6,22 @@
 <Parameter name="Number" type="int" value="1"/>
 <Parameter name="Parameter 0" type="string" value="Glen's Law Homotopy Parameter"/>
 </ParameterList>
+
+
+  <ParameterList name="Dirichlet BCs">
+    <!--Parameter name="DBC on NS dirichlet for DOF U0 prescribe Field" type="string" value="dirichlet_field"/-->
+    <!-- Free-slip bc along north and south: -->
+    <Parameter name="DBC on NS dirichlet for DOF U1 prescribe Field" type="string" value="dirichlet_field"/>
+  </ParameterList>
+  <ParameterList name="Neumann BCs">
+    <Parameter name="NBC on SS basalside for DOF all set basal" type="Array(double)" value="{0.0, 0.0, 0.0, 0.0, 0.0}"/>
+    <Parameter name="NBC on SS floatinglateralside for DOF all set lateral" type="Array(double)" value="{0.88521}"/>
+    <!-- power law basal friction law: -->
+    <Parameter name="BetaXY" type="string" value="Power Law Scalar Field"/>
+    <!-- increase accuracy of quadrature rule to help convergence: -->
+    <Parameter name="Cubature Degree" type="int" value="5"/>
+  </ParameterList>
+
 <ParameterList name="FELIX Viscosity">
 <Parameter name="Type" type="string" value="Glen's Law"/>
 <!--
@@ -98,7 +114,8 @@
 </ParameterList>
 <ParameterList name="Test 1">
   <Parameter name="Test Type" type="string" value="MaxIters"/>
-  <Parameter name="Maximum Iterations" type="int" value="15"/>
+  <Parameter name="Maximum Iterations" type="int" value="50"/>
+  <!-- Note: Sometimes need a fairly large value here to ensure convergence -->
 </ParameterList>
 </ParameterList>
 <ParameterList name="Direction">
