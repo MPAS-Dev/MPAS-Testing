@@ -106,7 +106,7 @@ kinbcmask[:] = 0
 kinbcmask[:, np.nonzero(np.logical_and(shelfMask==0, shelfMaskWithGround==1))[0], :] = 1
 #kinbcmask[:, np.nonzero(yCell[:]<0.0)[0] ] = 0
 # Need to extend this mask south by one cell so that the extended FEM mask will still have the 0 velo on the edges...
-theSides = Counter(xCell[ np.nonzero(kinbcmask[0,:])[0] ]).most_common(4)  # need the 4 most common x positions.
+theSides = Counter(xCell[:][ np.nonzero(kinbcmask[0,:])[0] ]).most_common(4)  # need the 4 most common x positions.
 for side in theSides:
     thesideindices = np.nonzero( np.logical_and( xCell[:] == side[0] , yCell[:] <= 0.0 ) )[0]
     kinbcmask[:, thesideindices] = 1
