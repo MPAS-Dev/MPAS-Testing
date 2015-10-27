@@ -145,7 +145,8 @@ gridfile.variables['uReconstructX'][:] = 0.0
 gridfile.variables['uReconstructY'][:] = 0.0
 
 # beta is not correct
-gridfile.variables['beta'][:] = 1.0e7  # For the basal friction law being used, beta holds the 'C' coefficient in Pa m^-1/3 s^1/3
+#gridfile.variables['beta'][:] = 1.0e7 / 3.14e7**(1.0/m)   # For the basal friction law being used, beta holds the 'C' coefficient in Pa m^-1/3 s^1/3
+gridfile.variables['beta'][:] = 31880.0  # For the basal friction law being used, beta holds the 'C' coefficient.  The beta units in MPAS are a mess right now.  This value translates to 10^7 Pa m^-1/3 s^1/3
 
 # constant, arbitrary temperature, K
 gridfile.variables['temperature'][:] = 273.15
