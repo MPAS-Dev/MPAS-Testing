@@ -7,8 +7,7 @@
 ! These density values are specified in the test case description
 	config_ice_density = 917.0
 	config_ocean_density = 1028.0
-!	config_default_flowParamA = 4.3905866e-24
-!	config_default_flowParamA = 1.8074581e-25
+	config_default_flowParamA = 1.8074581e-25
 	config_dynamic_thickness = 10.0
 /
 &time_integration
