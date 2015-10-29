@@ -7,6 +7,7 @@
 &physical_parameters
     config_ice_density = 900.0
     config_ocean_density = 1000.0
+    config_default_flowParamA = 1e-25
     config_sea_level = 0.0
     config_dynamic_thickness = 1.0
 /
@@ -26,7 +27,7 @@
     config_start_time = '0000-01-01_00:00:00'
 !    config_do_restart = .true.
 !    config_start_time = 'file'
-    config_stop_time = '0400-01-01_00:00:00'
+    config_stop_time = '0500-01-01_00:00:00'
     config_run_duration = 'none'
     config_calendar_type = 'gregorian_noleap'
     config_restart_timestamp_name = 'restart_timestamp'

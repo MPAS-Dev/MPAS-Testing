@@ -97,8 +97,7 @@ thickness[0, np.nonzero(shelfMaskWithGround==1)[0] ] = 500.0
 
 # flat bed at -2000 m everywhere but grounded around the edges
 bedTopography[np.nonzero(shelfMask==1)[0]] = -2000.0
-# For the densities specified in the test case description, -446.0117 is grounding depth.  Make the bed topo just slightly shallower to only lightly ground the ice here - make it shallower and there will be surface slopes into the shelf, make it much deeper and you run the risk of it being calculated in the code as floating.
-bedTopography[np.nonzero(shelfMask==0)[0]] = -446.0
+bedTopography[np.nonzero(shelfMask==0)[0]] = -440.0
 
 # Dirichlet velocity mask
 kinbcmask[:] = 0
@@ -127,7 +126,7 @@ layerThicknessFractions[:] = 1.0 / nVertLevels
 # boundary conditions
 SMB[:] = 0.0  # m/yr
 # Convert from units of m/yr to kg/m2/s using an assumed ice density
-SMB[:] = SMB[:] *917.0/(3600.0*24.0*365.0)
+SMB[:] = SMB[:] *910.0/(3600.0*24.0*365.0)
 
 gridfile.close()
 
